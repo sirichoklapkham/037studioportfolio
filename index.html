@@ -396,7 +396,6 @@
 
         const ADMIN_PASSWORD = "037cafe";
 
-        // อ่าน URL Parameter ลำดับแรก ถ้ามีแชร์ URL เข้ามาจากเครื่องอื่น
         const urlParams = new URLSearchParams(window.location.search);
         let urlSheetParam = urlParams.get('sheetUrl') || urlParams.get('scriptUrl');
 
@@ -405,7 +404,6 @@
         let apiKey = localStorage.getItem('photo_portfolio_api_key') || '';
         let sheetUrl = urlSheetParam || localStorage.getItem('photo_portfolio_sheet_url') || '';
         
-        // หากส่ง sheetUrl มาทาง URL Parameter ให้บันทึกไว้ใช้งานทันที
         if (urlSheetParam) {
             localStorage.setItem('photo_portfolio_sheet_url', urlSheetParam);
         }
@@ -419,9 +417,6 @@
         let touchStartX = 0;
         let touchEndX = 0;
 
-        /**
-         * ฟังก์ชันแปลง URL หรือ ID จาก Google Drive ให้เป็น Direct Image Link (lh3.googleusercontent.com)
-         */
         function formatImageUrl(input) {
             if (!input || !input.trim()) return 'https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72';
             let str = input.trim();
@@ -484,11 +479,10 @@
             document.getElementById('apiKeyInput').value = apiKey;
             document.getElementById('sheetUrlInput').value = sheetUrl;
 
-            // หากมี Web App URL ตั้งไว้แล้ว ให้ดึงข้อมูลล่าสุดจาก Cloud มาอัปเดตให้อุปกรณ์นี้ก่อนเสมอ
+            // หากมี Web App URL ตั้งไว้แล้ว ให้ดึงข้อมูลล่าสุดจาก Google Sheets มาใช้งานก่อน
             if (sheetUrl) {
                 await restoreFromSheet(true);
             } else {
-                // ถ้าไม่มีข้อมูล ให้เรนเดอร์ข้อมูล LocalStorage / Default เดิม
                 renderAdminServicesList();
                 renderAboutInfo();
                 renderCategories();
@@ -834,7 +828,7 @@
             if (sheetUrl) backupToSheet();
         }
 
-        // Google Sheets Sync & Backup
+        // ฟังก์ชันสำรองข้อมูลทั้งหมดไปยัง Google Sheets
         async function backupToSheet() {
             if (!sheetUrl) {
                 showToast('กรุณาใส่ Google Apps Script Web App URL ก่อน', true);
@@ -854,13 +848,14 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                showToast('สำรองและซิงค์ข้อมูลลง Google ชีทเรียบร้อยแล้ว');
+                showToast('สำรองข้อมูลลง Google ชีทเรียบร้อยแล้ว');
             } catch (err) {
                 console.error(err);
                 showToast('เกิดข้อผิดพลาดในการสำรองข้อมูล', true);
             }
         }
 
+        // ฟังก์ชันกู้คืนข้อมูลทั้งหมดกลับมาจาก Google Sheets
         async function restoreFromSheet(silent = false) {
             if (!sheetUrl) {
                 if (!silent) showToast('กรุณาใส่ Google Apps Script Web App URL ก่อน', true);
@@ -873,9 +868,14 @@
                 const response = await fetch(sheetUrl);
                 const data = await response.json();
 
-                if (data && data.categories) {
-                    categories = data.categories;
+                if (data) {
+                    // 1. กู้คืน Categories
+                    if (data.categories) {
+                        categories = data.categories;
+                        saveCategoriesLocallyOnly();
+                    }
                     
+                    // 2. กู้คืน AboutUs
                     if (data.aboutInfo && Object.keys(data.aboutInfo).length > 0) {
                         aboutInfo = {
                             shopName: data.aboutInfo.shopName || aboutInfo.shopName,
@@ -898,13 +898,13 @@
                         renderAdminServicesList();
                     }
 
+                    // 3. กู้คืน API Key
                     if (data.apiKey) {
                         apiKey = data.apiKey;
                         if (document.getElementById('apiKeyInput')) document.getElementById('apiKeyInput').value = apiKey;
                         localStorage.setItem('photo_portfolio_api_key', apiKey);
                     }
 
-                    saveCategoriesLocallyOnly();
                     renderCategories();
                     renderAdminCategoryList();
                     loadActiveImages();
