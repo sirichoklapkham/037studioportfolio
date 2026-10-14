@@ -870,23 +870,45 @@
                 const data = await response.json();
 
                 if (data && data.categories) {
+                    // ดึง categories
                     categories = data.categories;
-                    if (data.aboutInfo) {
-                        aboutInfo = data.aboutInfo;
+                    
+                    // ดึงข้อมูล AboutUs และตรวจสอบว่ามีข้อมูลจริงก่อนเขียนทับ เพื่อป้องกันค่าหาย/รีเซ็ต
+                    if (data.aboutInfo && Object.keys(data.aboutInfo).length > 0) {
+                        aboutInfo = {
+                            shopName: data.aboutInfo.shopName || aboutInfo.shopName,
+                            ownerName: data.aboutInfo.ownerName || aboutInfo.ownerName,
+                            shopLogoUrl: data.aboutInfo.shopLogoUrl || aboutInfo.shopLogoUrl || aboutInfo.shopImgUrl,
+                            shopImgUrl: data.aboutInfo.shopImgUrl || aboutInfo.shopImgUrl,
+                            aboutBio: data.aboutInfo.aboutBio || aboutInfo.aboutBio,
+                            services: (data.aboutInfo.services && data.aboutInfo.services.length > 0) ? data.aboutInfo.services : aboutInfo.services
+                        };
+                        
                         localStorage.setItem('photo_portfolio_about', JSON.stringify(aboutInfo));
+                        
+                        // อัปเดตอินพุตในหน้า Admin
+                        if (document.getElementById('adminShopName')) document.getElementById('adminShopName').value = aboutInfo.shopName;
+                        if (document.getElementById('adminOwnerName')) document.getElementById('adminOwnerName').value = aboutInfo.ownerName;
+                        if (document.getElementById('adminShopLogoUrl')) document.getElementById('adminShopLogoUrl').value = aboutInfo.shopLogoUrl;
+                        if (document.getElementById('adminShopImgUrl')) document.getElementById('adminShopImgUrl').value = aboutInfo.shopImgUrl;
+                        if (document.getElementById('adminAboutBio')) document.getElementById('adminAboutBio').value = aboutInfo.aboutBio;
+
                         renderAboutInfo();
                         renderAdminServicesList();
                     }
+
                     if (data.apiKey) {
                         apiKey = data.apiKey;
                         document.getElementById('apiKeyInput').value = apiKey;
                         localStorage.setItem('photo_portfolio_api_key', apiKey);
                     }
+
                     saveCategoriesLocallyOnly();
                     renderCategories();
                     renderAdminCategoryList();
                     loadActiveImages();
-                    showToast('ดึงข้อมูลกู้คืนจาก Google ชีทสำเร็จ');
+                    
+                    if (!silent) showToast('ดึงข้อมูลกู้คืนจาก Google ชีทสำเร็จ');
                 } else {
                     if (!silent) showToast('ไม่พบข้อมูลสำรองใน Google ชีท', true);
                 }
