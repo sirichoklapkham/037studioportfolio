@@ -47,7 +47,7 @@
         <div class="max-w-7xl mx-auto px-4 py-3 sm:py-4 flex justify-between items-center">
             <div class="flex items-center space-x-2.5 cursor-pointer" onclick="resetToHome()">
                 <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center overflow-hidden shrink-0">
-                    <img id="headerLogoImg" src="https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72" alt="037Studio Logo" class="w-full h-full object-cover">
+                    <img id="headerLogoImg" src="https://lh3.googleusercontent.com/d/13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL" alt="037Studio Logo" class="w-full h-full object-cover">
                 </div>
                 <div>
                     <h1 id="headerShopTitle" class="text-base sm:text-lg font-bold tracking-widest uppercase text-white leading-tight">037Studio</h1>
@@ -222,7 +222,7 @@
                 <div class="flex items-center gap-3 cursor-pointer" onclick="toggleAboutCollapse()">
                     <!-- Custom Logo Img -->
                     <div class="w-10 h-10 rounded-2xl bg-neutral-950 border border-amber-500/30 overflow-hidden flex items-center justify-center shrink-0 shadow-inner">
-                        <img id="aboutSectionLogo" src="https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72" alt="037Studio Logo" class="w-full h-full object-cover">
+                        <img id="aboutSectionLogo" src="https://lh3.googleusercontent.com/d/13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL" alt="037Studio Logo" class="w-full h-full object-cover">
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
@@ -246,7 +246,7 @@
                 <div class="pt-5 mt-4 border-t border-neutral-800/80 flex flex-col md:flex-row items-center gap-6">
                     <!-- ฝั่งซ้าย: รูปบรรยากาศร้าน -->
                     <div class="w-full md:w-5/12 aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-950 border border-neutral-800 relative group shrink-0 shadow-lg">
-                        <img id="displayShopImg" src="https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72" alt="บรรยากาศร้าน 037Studio" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <img id="displayShopImg" src="https://lh3.googleusercontent.com/d/13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL" alt="บรรยากาศร้าน 037Studio" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         <div class="absolute top-3 left-3 bg-neutral-950/80 backdrop-blur-md border border-neutral-800 px-3 py-1 rounded-full flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                             <span class="text-[10px] font-medium text-neutral-300">Open Studio</span>
@@ -348,6 +348,9 @@
     </div>
 
     <script>
+        const DEFAULT_LOGO_URL = 'https://lh3.googleusercontent.com/d/13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL';
+        const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwAMS0xqSV-9t9com4LFQzcRZ7rHwNMp-GHkJyy-kU6YaYCEpTNR40io5fz__sGkZIm8g/exec';
+
         const DEFAULT_CATEGORIES = [
             { id: 'portfolio', name: 'ผลงาน', description: 'แพ็คเกจเริ่มต้นถ่ายภาพนอกสถานที่ 3,500 บาท / 2 ชนิดรูปภาพ\n- ส่งงานไฟล์รูปปรับแสงสีทั้งหมด\n- ปรับผิวรีทัชเนียนพิเศษ 20 รูป', folderId: '', subcategories: [] },
             { id: 'profile-studio', name: 'สตูดิโอโปรไฟล์', description: 'ถ่ายภาพสตูดิโอส่วนตัว เริ่มต้น 2,500 บาท / 1 ชม.\n- รวมปรับแต่งไฟในสตูดิโอ\n- ปรับผิวและทรงผมในรูปไฮไลท์', folderId: '', subcategories: [] },
@@ -372,8 +375,8 @@
         const DEFAULT_ABOUT = {
             shopName: '037Studio Cafe & Photography',
             ownerName: 'คุณเอก (เจ้าของร้าน) & น้องตาร์ (ลูกเจ้าของร้าน)',
-            shopLogoUrl: 'https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72',
-            shopImgUrl: 'https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72',
+            shopLogoUrl: DEFAULT_LOGO_URL,
+            shopImgUrl: DEFAULT_LOGO_URL,
             aboutBio: 'ยินดีต้อนรับสู่สตูดิโอถ่ายภาพและคาเฟ่ บรรยากาศเป็นกันเอง พร้อมสร้างสรรค์ผลงานคุณภาพด้วยอุปกรณ์มาตรฐานระดับมืออาชีพ',
             services: [
                 {
@@ -402,11 +405,11 @@
         let categories = JSON.parse(localStorage.getItem('photo_portfolio_categories_v2')) || DEFAULT_CATEGORIES;
         let aboutInfo = JSON.parse(localStorage.getItem('photo_portfolio_about')) || DEFAULT_ABOUT;
         let apiKey = localStorage.getItem('photo_portfolio_api_key') || '';
-        let sheetUrl = urlSheetParam || localStorage.getItem('photo_portfolio_sheet_url') || '';
         
-        if (urlSheetParam) {
-            localStorage.setItem('photo_portfolio_sheet_url', urlSheetParam);
-        }
+        // ตั้งค่า Web App URL ล่าสุดเป็นค่าหลักหากยังไม่ได้ตั้งค่า
+        let sheetUrl = urlSheetParam || localStorage.getItem('photo_portfolio_sheet_url') || DEFAULT_SCRIPT_URL;
+        
+        localStorage.setItem('photo_portfolio_sheet_url', sheetUrl);
 
         let { activeCategoryId, activeSubcategoryId } = getInitialCategoryState();
         let loadedImages = [];
@@ -418,7 +421,7 @@
         let touchEndX = 0;
 
         function formatImageUrl(input) {
-            if (!input || !input.trim()) return 'https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72';
+            if (!input || !input.trim()) return DEFAULT_LOGO_URL;
             let str = input.trim();
             
             if (str.startsWith('http') && !str.includes('drive.google.com') && !str.includes('lh3.googleusercontent.com')) {
@@ -613,7 +616,7 @@
                     <div class="bg-neutral-950/90 border border-neutral-800 rounded-2xl overflow-hidden group hover:border-neutral-700 transition flex flex-col justify-between">
                         ${svcImg ? `
                             <div class="aspect-[16/9] overflow-hidden bg-neutral-900 relative">
-                                <img src="${svcImg}" alt="${escapeHtml(svc.title)}" onerror="this.src='https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <img src="${svcImg}" alt="${escapeHtml(svc.title)}" onerror="this.src='${DEFAULT_LOGO_URL}'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 <button onclick="openCustomSingleImage('${svcImg}', '${escapeHtml(svc.title)}')" class="absolute bottom-2 right-2 bg-neutral-950/80 backdrop-blur-md text-[10px] text-neutral-300 px-2 py-1 rounded-lg border border-neutral-800 hover:text-white">🔍 ขยายภาพ</button>
                             </div>
                         ` : ''}
@@ -676,8 +679,8 @@
 
         function saveSheetUrl() {
             const url = document.getElementById('sheetUrlInput').value.trim();
-            sheetUrl = url;
-            localStorage.setItem('photo_portfolio_sheet_url', url);
+            sheetUrl = url || DEFAULT_SCRIPT_URL;
+            localStorage.setItem('photo_portfolio_sheet_url', sheetUrl);
             showToast('บันทึก Web App URL เรียบร้อยแล้ว');
             if (sheetUrl) backupToSheet();
         }
@@ -728,8 +731,8 @@
                         aboutInfo = {
                             shopName: data.aboutInfo.shopName || aboutInfo.shopName,
                             ownerName: data.aboutInfo.ownerName || aboutInfo.ownerName,
-                            shopLogoUrl: data.aboutInfo.shopLogoUrl || aboutInfo.shopLogoUrl || aboutInfo.shopImgUrl,
-                            shopImgUrl: data.aboutInfo.shopImgUrl || aboutInfo.shopImgUrl,
+                            shopLogoUrl: data.aboutInfo.shopLogoUrl || aboutInfo.shopLogoUrl || DEFAULT_LOGO_URL,
+                            shopImgUrl: data.aboutInfo.shopImgUrl || aboutInfo.shopImgUrl || DEFAULT_LOGO_URL,
                             aboutBio: data.aboutInfo.aboutBio || aboutInfo.aboutBio,
                             services: (data.aboutInfo.services && data.aboutInfo.services.length > 0) ? data.aboutInfo.services : aboutInfo.services
                         };
