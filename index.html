@@ -479,7 +479,7 @@
             document.getElementById('apiKeyInput').value = apiKey;
             document.getElementById('sheetUrlInput').value = sheetUrl;
 
-            // หากมี Web App URL ตั้งไว้แล้ว ให้ดึงข้อมูลล่าสุดจาก Google Sheets มาใช้งานก่อน
+            // หากมี Web App URL ตั้งไว้แล้ว ให้ดึงข้อมูลล่าสุดจาก Google Sheets มาใช้งานก่อนเสมอ
             if (sheetUrl) {
                 await restoreFromSheet(true);
             } else {
