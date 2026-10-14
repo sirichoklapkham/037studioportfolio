@@ -112,7 +112,7 @@
             </div>
 
             <!-- About Us & Dynamic Services Admin Settings -->
-            <div class="space-y-3 pt-1">
+            <div class="space-y-4 pt-1">
                 <h3 class="text-xs sm:text-sm font-semibold text-amber-400 flex items-center gap-1.5">
                     <span>👋</span> ตั้งค่าข้อมูลแนะนำตัว & รายละเอียดบริการ (About & Services)
                 </h3>
@@ -126,9 +126,15 @@
                         <input type="text" id="adminOwnerName" placeholder="คุณเอก (เจ้าของร้าน) & น้องตาร์ (ลูกเจ้าของร้าน)" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs text-white">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-[11px] text-neutral-400 mb-1">รูปภาพโลโก้ร้าน / ภาพแนะนำตัว (Google Drive Folder/File ID หรือ URL):</label>
-                    <input type="text" id="adminShopImgUrl" placeholder="วางลิงก์ https://drive.google.com/..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs text-white">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] text-neutral-400 mb-1">รูปภาพโลโก้ร้าน (Google Drive Link):</label>
+                        <input type="text" id="adminShopLogoUrl" placeholder="วางลิงก์โลโก้ https://drive.google.com/..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-neutral-400 mb-1">ภาพบรรยากาศ/แนะนำตัวร้าน (Google Drive Link):</label>
+                        <input type="text" id="adminShopImgUrl" placeholder="วางลิงก์ภาพแนะนำตัว https://drive.google.com/..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs text-white">
+                    </div>
                 </div>
                 <div>
                     <label class="block text-[11px] text-neutral-400 mb-1">ข้อความแนะนำตัวเพิ่มเติม:</label>
@@ -136,26 +142,28 @@
                 </div>
 
                 <!-- Manage Dynamic Services (Add / Delete) -->
-                <div class="pt-2 border-t border-neutral-800/80 space-y-3">
+                <div class="pt-3 border-t border-neutral-800/80 space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="text-[11px] font-semibold text-amber-300 block">🛠️ จัดการรายการบริการของทางร้าน:</span>
-                        <button onclick="addAdminService()" class="bg-amber-500 hover:bg-amber-400 text-black px-2.5 py-1 rounded-lg text-[11px] font-bold transition active:scale-95">
+                        <button onclick="addAdminService()" class="bg-amber-500 hover:bg-amber-400 text-black px-3 py-1 rounded-lg text-[11px] font-bold transition active:scale-95 shadow">
                             + เพิ่มบริการใหม่
                         </button>
                     </div>
 
-                    <div id="adminServicesList" class="space-y-2">
+                    <div id="adminServicesList" class="space-y-2.5">
                         <!-- Dynamic Service Admin Cards injected via JS -->
                     </div>
                 </div>
 
-                <button onclick="saveAboutInfo()" class="bg-emerald-500 hover:bg-emerald-400 text-black px-4 py-2 rounded-xl text-xs font-bold transition active:scale-95">
-                    บันทึกข้อมูลแนะนำตัว & บริการ
-                </button>
+                <div class="pt-2">
+                    <button onclick="saveAboutInfo()" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-black px-6 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 shadow-lg flex items-center justify-center gap-1.5">
+                        <span>💾</span> บันทึกข้อมูลแนะนำตัว & บริการ
+                    </button>
+                </div>
             </div>
 
             <!-- API Key Input -->
-            <div class="space-y-2 pt-2 border-t border-neutral-800/60">
+            <div class="space-y-2 pt-3 border-t border-neutral-800/60">
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Google Drive API Key:</label>
                 <div class="flex flex-col sm:flex-row gap-2">
                     <input type="password" id="apiKeyInput" placeholder="วาง Google Drive API Key ที่นี่..." 
@@ -167,7 +175,7 @@
             </div>
 
             <!-- Google Sheets Integration & Backup -->
-            <div class="space-y-2 pt-2 border-t border-neutral-800/60">
+            <div class="space-y-2 pt-3 border-t border-neutral-800/60">
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-emerald-400">📊 Google Sheets Backup Sync URL:</label>
                 <div class="flex flex-col sm:flex-row gap-2">
                     <input type="text" id="sheetUrlInput" placeholder="วาง Google Apps Script Web App URL..." 
@@ -187,7 +195,7 @@
             </div>
 
             <!-- Category Management -->
-            <div class="space-y-3 pt-2 border-t border-neutral-800/60">
+            <div class="space-y-3 pt-3 border-t border-neutral-800/60">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xs sm:text-sm font-semibold text-neutral-300">จัดการหมวดหมู่และรายละเอียดแพ็คเกจ</h3>
                     <button onclick="addNewCategory()" class="bg-white text-black hover:bg-neutral-200 text-[11px] sm:text-xs px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1 active:scale-95">
@@ -212,7 +220,7 @@
             <!-- Header Bar with Logo Image & Animated Trigger Button -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div class="flex items-center gap-3 cursor-pointer" onclick="toggleAboutCollapse()">
-                    <!-- Custom Logo Img replacing old camera icon -->
+                    <!-- Custom Logo Img -->
                     <div class="w-10 h-10 rounded-2xl bg-neutral-950 border border-amber-500/30 overflow-hidden flex items-center justify-center shrink-0 shadow-inner">
                         <img id="aboutSectionLogo" src="https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72" alt="037Studio Logo" class="w-full h-full object-cover">
                     </div>
@@ -364,6 +372,7 @@
         const DEFAULT_ABOUT = {
             shopName: '037Studio Cafe & Photography',
             ownerName: 'คุณเอก (เจ้าของร้าน) & น้องตาร์ (ลูกเจ้าของร้าน)',
+            shopLogoUrl: 'https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72',
             shopImgUrl: 'https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72',
             aboutBio: 'ยินดีต้อนรับสู่สตูดิโอถ่ายภาพและคาเฟ่ บรรยากาศเป็นกันเอง พร้อมสร้างสรรค์ผลงานคุณภาพด้วยอุปกรณ์มาตรฐานระดับมืออาชีพ',
             services: [
@@ -401,6 +410,46 @@
         let touchStartX = 0;
         let touchEndX = 0;
 
+        /**
+         * ฟังก์ชันแปลง URL หรือ ID จาก Google Drive ให้เป็น Direct Image Link (lh3.googleusercontent.com)
+         */
+        function formatImageUrl(input) {
+            if (!input || !input.trim()) return 'https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72';
+            let str = input.trim();
+            
+            // หากเป็น URL ตรงๆ ที่ไม่ใช่ google drive ให้ส่งค่ากลับทันที
+            if (str.startsWith('http') && !str.includes('drive.google.com') && !str.includes('lh3.googleusercontent.com')) {
+                return str;
+            }
+
+            let fileId = '';
+            if (str.includes('/file/d/')) {
+                fileId = str.split('/file/d/')[1].split('/')[0].split('?')[0];
+            } else if (str.includes('/folders/')) {
+                fileId = str.split('/folders/')[1].split('?')[0];
+            } else if (str.includes('id=')) {
+                fileId = str.split('id=')[1].split('&')[0];
+            } else if (str.includes('/d/')) {
+                fileId = str.split('/d/')[1].split('/')[0].split('?')[0];
+            } else {
+                fileId = str; // ในกรณีที่ใส่ ID มาตรงๆ
+            }
+
+            return fileId ? `https://lh3.googleusercontent.com/d/${fileId}` : str;
+        }
+
+        function extractFolderId(urlOrId) {
+            let cleanId = urlOrId ? urlOrId.trim() : '';
+            if (cleanId.includes('/folders/')) {
+                cleanId = cleanId.split('/folders/')[1].split('?')[0];
+            } else if (cleanId.includes('/d/')) {
+                cleanId = cleanId.split('/d/')[1].split('/')[0].split('?')[0];
+            } else if (cleanId.includes('id=')) {
+                cleanId = cleanId.split('id=')[1].split('&')[0];
+            }
+            return cleanId;
+        }
+
         function getInitialCategoryState() {
             const params = new URLSearchParams(window.location.search);
             const catParam = params.get('cat') || params.get('category');
@@ -430,6 +479,7 @@
             // Populate Admin About Inputs
             document.getElementById('adminShopName').value = aboutInfo.shopName || '';
             document.getElementById('adminOwnerName').value = aboutInfo.ownerName || '';
+            document.getElementById('adminShopLogoUrl').value = aboutInfo.shopLogoUrl || aboutInfo.shopImgUrl || '';
             document.getElementById('adminShopImgUrl').value = aboutInfo.shopImgUrl || '';
             document.getElementById('adminAboutBio').value = aboutInfo.aboutBio || '';
 
@@ -483,13 +533,22 @@
             container.innerHTML = svcs.map((svc, index) => `
                 <div class="bg-neutral-950/80 p-3 rounded-xl border border-neutral-800 space-y-2">
                     <div class="flex justify-between items-center">
-                        <span class="text-[11px] font-bold text-neutral-300">บริการที่ ${index + 1}:</span>
-                        <button onclick="deleteAdminService(${index})" class="text-[10px] text-red-400 border border-red-900/40 bg-red-950/20 px-2 py-0.5 rounded hover:bg-red-900/50 transition">ลบ</button>
+                        <span class="text-[11px] font-bold text-amber-300">บริการที่ ${index + 1}:</span>
+                        <button onclick="deleteAdminService(${index})" class="text-[10px] text-red-400 border border-red-900/40 bg-red-950/20 px-2.5 py-0.5 rounded hover:bg-red-900/50 transition">ลบ</button>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <input type="text" value="${escapeHtml(svc.title)}" onchange="updateAdminServiceField(${index}, 'title', this.value)" placeholder="ชื่อบริการ" class="bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
-                        <input type="text" value="${escapeHtml(svc.imgUrl)}" onchange="updateAdminServiceField(${index}, 'imgUrl', this.value)" placeholder="ลิงก์รูปภาพตัวอย่างบริการ" class="bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
-                        <input type="text" value="${escapeHtml(svc.desc)}" onchange="updateAdminServiceField(${index}, 'desc', this.value)" placeholder="คำอธิบายบริการแบบย่อ" class="bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
+                        <div>
+                            <label class="block text-[10px] text-neutral-500 mb-0.5">ชื่อบริการ:</label>
+                            <input type="text" id="svc_title_${index}" value="${escapeHtml(svc.title)}" placeholder="ชื่อบริการ" class="w-full bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-neutral-500 mb-0.5">ลิงก์รูปตัวอย่าง (Google Drive Link):</label>
+                            <input type="text" id="svc_img_${index}" value="${escapeHtml(svc.imgUrl)}" placeholder="วางลิงก์ https://drive.google.com/..." class="w-full bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-neutral-500 mb-0.5">รายละเอียดบริการย่อ:</label>
+                            <input type="text" id="svc_desc_${index}" value="${escapeHtml(svc.desc)}" placeholder="คำอธิบายบริการแบบย่อ" class="w-full bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -508,12 +567,6 @@
             }
         }
 
-        function updateAdminServiceField(index, field, value) {
-            if (aboutInfo.services && aboutInfo.services[index]) {
-                aboutInfo.services[index][field] = value.trim();
-            }
-        }
-
         function toggleAboutCollapse() {
             const body = document.getElementById('aboutCollapsibleBody');
             const text = document.getElementById('aboutToggleText');
@@ -524,12 +577,12 @@
 
             if (isAboutExpanded) {
                 body.classList.remove('max-h-0', 'opacity-0');
-                body.classList.add('max-h-[2000px]', 'opacity-100');
+                body.classList.add('max-h-[2500px]', 'opacity-100');
                 text.innerText = 'ย่อปิดข้อมูลร้าน';
                 arrow.style.transform = 'rotate(180deg)';
                 btn.classList.remove('animate-cta');
             } else {
-                body.classList.remove('max-h-[2000px]', 'opacity-100');
+                body.classList.remove('max-h-[2500px]', 'opacity-100');
                 body.classList.add('max-h-0', 'opacity-0');
                 text.innerText = 'ทำความรู้จักเราเพิ่มเติม';
                 arrow.style.transform = 'rotate(0deg)';
@@ -542,33 +595,30 @@
             document.getElementById('displayOwnerName').innerText = aboutInfo.ownerName ? `บริหารงานโดย ${aboutInfo.ownerName}` : '';
             document.getElementById('displayAboutBio').innerText = aboutInfo.aboutBio || '';
             
-            let imgUrl = aboutInfo.shopImgUrl || 'https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72';
-            if (imgUrl && !imgUrl.startsWith('http')) {
-                imgUrl = `https://lh3.googleusercontent.com/d/${extractFolderId(imgUrl)}`;
-            }
-            document.getElementById('displayShopImg').src = imgUrl;
-            document.getElementById('aboutSectionLogo').src = imgUrl;
-            document.getElementById('headerLogoImg').src = imgUrl;
+            // แยกโลโก้ร้าน และภาพแนะนำตัวบรรยากาศร้าน
+            let formattedLogoUrl = formatImageUrl(aboutInfo.shopLogoUrl || aboutInfo.shopImgUrl);
+            let formattedImgUrl = formatImageUrl(aboutInfo.shopImgUrl);
+
+            document.getElementById('displayShopImg').src = formattedImgUrl;
+            document.getElementById('aboutSectionLogo').src = formattedLogoUrl;
+            document.getElementById('headerLogoImg').src = formattedLogoUrl;
 
             // Render Dynamic Services Cards
             const svcs = aboutInfo.services || DEFAULT_ABOUT.services;
             const container = document.getElementById('servicesContainer');
 
             if (svcs.length === 0) {
-                container.innerHTML = '<p class="text-xs text-neutral-500">ยังไม่มีรายการบริการ</p>';
+                container.innerHTML = '<p class="text-xs text-neutral-500 col-span-3 text-center py-4">ยังไม่มีรายการบริการ</p>';
                 return;
             }
 
-            container.innerHTML = svcs.map((svc, i) => {
-                let svcImg = svc.imgUrl || '';
-                if (svcImg && !svcImg.startsWith('http')) {
-                    svcImg = `https://lh3.googleusercontent.com/d/${extractFolderId(svcImg)}`;
-                }
+            container.innerHTML = svcs.map((svc) => {
+                let svcImg = formatImageUrl(svc.imgUrl);
                 return `
                     <div class="bg-neutral-950/90 border border-neutral-800 rounded-2xl overflow-hidden group hover:border-neutral-700 transition flex flex-col justify-between">
                         ${svcImg ? `
                             <div class="aspect-[16/9] overflow-hidden bg-neutral-900 relative">
-                                <img src="${svcImg}" alt="${escapeHtml(svc.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <img src="${svcImg}" alt="${escapeHtml(svc.title)}" onerror="this.src='https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 <button onclick="openCustomSingleImage('${svcImg}', '${escapeHtml(svc.title)}')" class="absolute bottom-2 right-2 bg-neutral-950/80 backdrop-blur-md text-[10px] text-neutral-300 px-2 py-1 rounded-lg border border-neutral-800 hover:text-white">🔍 ขยายภาพ</button>
                             </div>
                         ` : ''}
@@ -587,14 +637,39 @@
         }
 
         function saveAboutInfo() {
+            // อ่านข้อมูลจากอินพุตหน้าหลัก
             aboutInfo.shopName = document.getElementById('adminShopName').value.trim();
             aboutInfo.ownerName = document.getElementById('adminOwnerName').value.trim();
+            aboutInfo.shopLogoUrl = document.getElementById('adminShopLogoUrl').value.trim();
             aboutInfo.shopImgUrl = document.getElementById('adminShopImgUrl').value.trim();
             aboutInfo.aboutBio = document.getElementById('adminAboutBio').value.trim();
             
+            // อ่านข้อมูลจากรายการบริการทั้งหมดใน DOM
+            if (!aboutInfo.services) aboutInfo.services = [];
+            let updatedServices = [];
+            
+            for (let i = 0; i < aboutInfo.services.length; i++) {
+                let titleEl = document.getElementById(`svc_title_${i}`);
+                let imgEl = document.getElementById(`svc_img_${i}`);
+                let descEl = document.getElementById(`svc_desc_${i}`);
+
+                if (titleEl && imgEl && descEl) {
+                    updatedServices.push({
+                        title: titleEl.value.trim(),
+                        imgUrl: imgEl.value.trim(),
+                        desc: descEl.value.trim()
+                    });
+                }
+            }
+            aboutInfo.services = updatedServices;
+
+            // บันทึกลง LocalStorage และแสดงผล
             localStorage.setItem('photo_portfolio_about', JSON.stringify(aboutInfo));
             renderAboutInfo();
-            showToast('บันทึกข้อมูลแนะนำตัว & บริการเรียบร้อยแล้ว');
+            renderAdminServicesList();
+            showToast('บันทึกข้อมูลแนะนำตัว & รายละเอียดบริการเรียบร้อยแล้ว');
+            
+            // ซิงค์ไปยัง Google Sheets
             if (sheetUrl) backupToSheet();
         }
 
@@ -1049,16 +1124,6 @@
             });
             saveCategories();
             renderCategories();
-        }
-
-        function extractFolderId(urlOrId) {
-            let cleanId = urlOrId.trim();
-            if (cleanId.includes('/folders/')) {
-                cleanId = cleanId.split('/folders/')[1].split('?')[0];
-            } else if (cleanId.includes('/d/')) {
-                cleanId = cleanId.split('/d/')[1].split('/')[0].split('?')[0];
-            }
-            return cleanId;
         }
 
         function updateFolderId(id, value) {
