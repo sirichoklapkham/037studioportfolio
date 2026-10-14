@@ -273,7 +273,7 @@
         </section>
 
         <!-- Active Category Title Bar -->
-        <div class="border-b border-neutral-900 pb-3">
+        <div id="activeCategoryHeader" class="border-b border-neutral-900 pb-3 scroll-mt-24">
             <span id="activeCategoryBreadcrumb" class="text-[9px] sm:text-[10px] uppercase tracking-widest text-neutral-500">PORTFOLIO</span>
             <h2 id="activeCategoryTitle" class="text-lg sm:text-2xl font-bold tracking-wide text-white">ผลงาน</h2>
         </div>
@@ -406,9 +406,7 @@
         let aboutInfo = JSON.parse(localStorage.getItem('photo_portfolio_about')) || DEFAULT_ABOUT;
         let apiKey = localStorage.getItem('photo_portfolio_api_key') || '';
         
-        // ตั้งค่า Web App URL ล่าสุดเป็นค่าหลักหากยังไม่ได้ตั้งค่า
         let sheetUrl = urlSheetParam || localStorage.getItem('photo_portfolio_sheet_url') || DEFAULT_SCRIPT_URL;
-        
         localStorage.setItem('photo_portfolio_sheet_url', sheetUrl);
 
         let { activeCategoryId, activeSubcategoryId } = getInitialCategoryState();
@@ -525,7 +523,33 @@
             });
         });
 
-        // ฟังก์ชันเมื่อลูกค้าคลิกที่การ์ดบริการ จะพาไปยังหมวดหมู่ที่มีชื่อเดียวกัน
+        // ฟังก์ชันย่อข้อมูลร้านและเลื่อนหน้าจอลงไปยังหมวดหมู่ที่เปิด
+        function collapseAboutAndScroll() {
+            const body = document.getElementById('aboutCollapsibleBody');
+            const text = document.getElementById('aboutToggleText');
+            const arrow = document.getElementById('aboutToggleArrow');
+            const btn = document.getElementById('aboutToggleBtn');
+
+            // ย่อส่วนข้อมูลร้านลงเสมอ
+            if (body && isAboutExpanded) {
+                isAboutExpanded = false;
+                body.classList.remove('max-h-[2500px]', 'opacity-100');
+                body.classList.add('max-h-0', 'opacity-0');
+                if (text) text.innerText = 'ทำความรู้จักเราเพิ่มเติม';
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+                if (btn) btn.classList.add('animate-cta');
+            }
+
+            // เลื่อนจอลงไปหาโซนหมวดหมู่
+            setTimeout(() => {
+                const headerEl = document.getElementById('activeCategoryHeader');
+                if (headerEl) {
+                    headerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+
+        // ฟังก์ชันนำทางไปยังหมวดหมู่เมื่อคลิกที่การ์ดบริการ
         function navigateToServiceCategory(serviceTitle) {
             if (!serviceTitle) return;
             const cleanTitle = serviceTitle.trim().toLowerCase();
@@ -705,7 +729,6 @@
             renderAdminServicesList();
             showToast('บันทึกข้อมูลแนะนำตัว & รายละเอียดบริการเรียบร้อยแล้ว');
             
-            // Auto Save ไปยัง Google ชีททันที
             if (sheetUrl) backupToSheet();
         }
 
@@ -726,7 +749,6 @@
             if (sheetUrl) backupToSheet();
         }
 
-        // ฟังก์ชันสำรองและจัดเก็บข้อมูลลง Google Sheets แบบ Auto Sync
         async function backupToSheet() {
             if (!sheetUrl) return;
 
@@ -750,7 +772,6 @@
             }
         }
 
-        // ฟังก์ชันดึงและอัปเดตข้อมูลย้อนกลับมาจาก Google Sheets แบบ Auto Sync
         async function restoreFromSheet(silent = false) {
             if (!sheetUrl) return;
 
@@ -761,13 +782,11 @@
                 const data = await response.json();
 
                 if (data) {
-                    // 1. ดึงข้อมูลหมวดหมู่
                     if (data.categories && Array.isArray(data.categories) && data.categories.length > 0) {
                         categories = data.categories;
                         saveCategoriesLocallyOnly();
                     }
                     
-                    // 2. ดึงข้อมูล AboutUs & Services
                     if (data.aboutInfo && Object.keys(data.aboutInfo).length > 0) {
                         aboutInfo = {
                             shopName: data.aboutInfo.shopName || aboutInfo.shopName,
@@ -790,7 +809,6 @@
                         renderAdminServicesList();
                     }
 
-                    // 3. ดึงข้อมูล Google Drive API Key
                     if (data.apiKey) {
                         apiKey = data.apiKey;
                         if (document.getElementById('apiKeyInput')) document.getElementById('apiKeyInput').value = apiKey;
@@ -1213,6 +1231,7 @@
             updateUrlCategory(id, null);
             renderCategories();
             loadActiveImages();
+            collapseAboutAndScroll(); // ย่อข้อมูลร้าน + เลื่อนลงไปหาหมวดหมู่
         }
 
         function selectSubcategory(subId) {
@@ -1220,6 +1239,7 @@
             updateUrlCategory(activeCategoryId, subId);
             renderCategories();
             loadActiveImages();
+            collapseAboutAndScroll(); // ย่อข้อมูลร้าน + เลื่อนลงไปหาหมวดหมู่
         }
 
         function resetToHome() {
