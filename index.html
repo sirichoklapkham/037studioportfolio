@@ -479,7 +479,7 @@
             document.getElementById('apiKeyInput').value = apiKey;
             document.getElementById('sheetUrlInput').value = sheetUrl;
 
-            // หากมี Web App URL ตั้งไว้แล้ว ให้ดึงข้อมูลล่าสุดจาก Google Sheets มาใช้งานก่อนเสมอ
+            // หากมี Web App URL ตั้งไว้แล้ว ให้ดึงข้อมูลล่าสุดจาก Google Sheets มาอัปเดตอัตโนมัติ
             if (sheetUrl) {
                 await restoreFromSheet(true);
             } else {
@@ -828,7 +828,7 @@
             if (sheetUrl) backupToSheet();
         }
 
-        // ฟังก์ชันสำรองข้อมูลทั้งหมดไปยัง Google Sheets
+        // ปรับปรุงการบันทึกข้อมูลไปยัง Google Sheets รองรับ CORS 100%
         async function backupToSheet() {
             if (!sheetUrl) {
                 showToast('กรุณาใส่ Google Apps Script Web App URL ก่อน', true);
@@ -842,10 +842,11 @@
             };
 
             try {
+                // ปรับส่งด้วย POST Text Body ป้องกันติดปัญหา CORS บนบราวเซอร์อุปกรณ์อื่น
                 await fetch(sheetUrl, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
                 showToast('สำรองข้อมูลลง Google ชีทเรียบร้อยแล้ว');
@@ -855,7 +856,7 @@
             }
         }
 
-        // ฟังก์ชันกู้คืนข้อมูลทั้งหมดกลับมาจาก Google Sheets
+        // ปรับปรุงการดึงข้อมูลจาก Google Sheets
         async function restoreFromSheet(silent = false) {
             if (!sheetUrl) {
                 if (!silent) showToast('กรุณาใส่ Google Apps Script Web App URL ก่อน', true);
@@ -870,7 +871,7 @@
 
                 if (data) {
                     // 1. กู้คืน Categories
-                    if (data.categories) {
+                    if (data.categories && Array.isArray(data.categories) && data.categories.length > 0) {
                         categories = data.categories;
                         saveCategoriesLocallyOnly();
                     }
