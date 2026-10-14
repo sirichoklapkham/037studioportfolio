@@ -157,7 +157,7 @@
 
                 <div class="pt-2">
                     <button onclick="saveAboutInfo()" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-black px-6 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 shadow-lg flex items-center justify-center gap-1.5">
-                        <span>💾</span> บันทึกข้อมูลแนะนำตัว & บริการ
+                        <span>💾</span> บันทึกข้อมูลแนะนำตัว & บริการ (Auto Save To Google ชีท)
                     </button>
                 </div>
             </div>
@@ -186,7 +186,7 @@
                 </div>
                 <div class="flex flex-wrap gap-2 pt-1">
                     <button onclick="backupToSheet()" class="bg-neutral-800 hover:bg-neutral-700 text-emerald-400 border border-emerald-800/50 px-3 py-1.5 rounded-lg text-xs font-medium transition active:scale-95">
-                        📤 สำรองข้อมูลลง Google ชีท
+                        📤 สำรองข้อมูลลง Google ชีททันที
                     </button>
                     <button onclick="restoreFromSheet()" class="bg-neutral-800 hover:bg-neutral-700 text-sky-400 border border-sky-800/50 px-3 py-1.5 rounded-lg text-xs font-medium transition active:scale-95">
                         📥 ดึงข้อมูลคืนจาก Google ชีท
@@ -479,7 +479,7 @@
             document.getElementById('apiKeyInput').value = apiKey;
             document.getElementById('sheetUrlInput').value = sheetUrl;
 
-            // หากมี Web App URL ตั้งไว้แล้ว ให้ดึงข้อมูลล่าสุดจาก Google Sheets มาอัปเดตอัตโนมัติ
+            // ดึงข้อมูลอัตโนมัติจาก Google ชีททันทีเมื่อเปิดหน้าเว็บ
             if (sheetUrl) {
                 await restoreFromSheet(true);
             } else {
@@ -560,6 +560,7 @@
             if (confirm('คุณต้องการลบบริการนี้หรือไม่?')) {
                 aboutInfo.services.splice(index, 1);
                 renderAdminServicesList();
+                saveAboutInfo();
             }
         }
 
@@ -660,7 +661,119 @@
             renderAdminServicesList();
             showToast('บันทึกข้อมูลแนะนำตัว & รายละเอียดบริการเรียบร้อยแล้ว');
             
+            // Auto Save ไปยัง Google ชีททันที
             if (sheetUrl) backupToSheet();
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            apiKey = key;
+            localStorage.setItem('photo_portfolio_api_key', key);
+            showToast('บันทึก API Key เรียบร้อยแล้ว');
+            saveCategories();
+            loadActiveImages();
+        }
+
+        function saveSheetUrl() {
+            const url = document.getElementById('sheetUrlInput').value.trim();
+            sheetUrl = url;
+            localStorage.setItem('photo_portfolio_sheet_url', url);
+            showToast('บันทึก Web App URL เรียบร้อยแล้ว');
+            if (sheetUrl) backupToSheet();
+        }
+
+        // ฟังก์ชันสำรองและจัดเก็บข้อมูลลง Google Sheets แบบ Auto Sync
+        async function backupToSheet() {
+            if (!sheetUrl) return;
+
+            const payload = {
+                apiKey: apiKey,
+                categories: categories,
+                aboutInfo: aboutInfo
+            };
+
+            try {
+                await fetch(sheetUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                showToast('อัปเดตและบันทึกข้อมูลลง Google ชีทเรียบร้อย');
+            } catch (err) {
+                console.error(err);
+                showToast('เกิดข้อผิดพลาดในการเชื่อมต่อกับ Google ชีท', true);
+            }
+        }
+
+        // ฟังก์ชันดึงและอัปเดตข้อมูลย้อนกลับมาจาก Google Sheets แบบ Auto Sync
+        async function restoreFromSheet(silent = false) {
+            if (!sheetUrl) return;
+
+            if (!silent && !confirm('คุณต้องการดึงข้อมูลที่สำรองไว้ใน Google ชีทมาทับข้อมูลปัจจุบันหรือไม่?')) return;
+
+            try {
+                const response = await fetch(sheetUrl);
+                const data = await response.json();
+
+                if (data) {
+                    // 1. ดึงข้อมูลหมวดหมู่
+                    if (data.categories && Array.isArray(data.categories) && data.categories.length > 0) {
+                        categories = data.categories;
+                        saveCategoriesLocallyOnly();
+                    }
+                    
+                    // 2. ดึงข้อมูล AboutUs & Services
+                    if (data.aboutInfo && Object.keys(data.aboutInfo).length > 0) {
+                        aboutInfo = {
+                            shopName: data.aboutInfo.shopName || aboutInfo.shopName,
+                            ownerName: data.aboutInfo.ownerName || aboutInfo.ownerName,
+                            shopLogoUrl: data.aboutInfo.shopLogoUrl || aboutInfo.shopLogoUrl || aboutInfo.shopImgUrl,
+                            shopImgUrl: data.aboutInfo.shopImgUrl || aboutInfo.shopImgUrl,
+                            aboutBio: data.aboutInfo.aboutBio || aboutInfo.aboutBio,
+                            services: (data.aboutInfo.services && data.aboutInfo.services.length > 0) ? data.aboutInfo.services : aboutInfo.services
+                        };
+                        
+                        localStorage.setItem('photo_portfolio_about', JSON.stringify(aboutInfo));
+                        
+                        if (document.getElementById('adminShopName')) document.getElementById('adminShopName').value = aboutInfo.shopName;
+                        if (document.getElementById('adminOwnerName')) document.getElementById('adminOwnerName').value = aboutInfo.ownerName;
+                        if (document.getElementById('adminShopLogoUrl')) document.getElementById('adminShopLogoUrl').value = aboutInfo.shopLogoUrl;
+                        if (document.getElementById('adminShopImgUrl')) document.getElementById('adminShopImgUrl').value = aboutInfo.shopImgUrl;
+                        if (document.getElementById('adminAboutBio')) document.getElementById('adminAboutBio').value = aboutInfo.aboutBio;
+
+                        renderAboutInfo();
+                        renderAdminServicesList();
+                    }
+
+                    // 3. ดึงข้อมูล Google Drive API Key
+                    if (data.apiKey) {
+                        apiKey = data.apiKey;
+                        if (document.getElementById('apiKeyInput')) document.getElementById('apiKeyInput').value = apiKey;
+                        localStorage.setItem('photo_portfolio_api_key', apiKey);
+                    }
+
+                    renderCategories();
+                    renderAdminCategoryList();
+                    loadActiveImages();
+                    
+                    if (!silent) showToast('ดึงข้อมูลกู้คืนจาก Google ชีทสำเร็จ');
+                }
+            } catch (err) {
+                console.error(err);
+                if (!silent) showToast('เกิดข้อผิดพลาดในการดึงข้อมูลจาก Google ชีท', true);
+            }
+        }
+
+        function saveCategoriesLocallyOnly() {
+            localStorage.setItem('photo_portfolio_categories_v2', JSON.stringify(categories));
+        }
+
+        function saveCategories() {
+            saveCategoriesLocallyOnly();
+            if (sheetUrl) {
+                backupToSheet();
+            }
         }
 
         function handleSwipeGesture() {
@@ -808,126 +921,6 @@
             } else {
                 panel.classList.add('hidden');
                 document.getElementById('adminBtnText').innerText = 'จัดการหลังบ้าน';
-            }
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            apiKey = key;
-            localStorage.setItem('photo_portfolio_api_key', key);
-            showToast('บันทึก API Key เรียบร้อยแล้ว');
-            saveCategories();
-            loadActiveImages();
-        }
-
-        function saveSheetUrl() {
-            const url = document.getElementById('sheetUrlInput').value.trim();
-            sheetUrl = url;
-            localStorage.setItem('photo_portfolio_sheet_url', url);
-            showToast('บันทึก Web App URL เรียบร้อยแล้ว');
-            if (sheetUrl) backupToSheet();
-        }
-
-        // ปรับปรุงการบันทึกข้อมูลไปยัง Google Sheets รองรับ CORS 100%
-        async function backupToSheet() {
-            if (!sheetUrl) {
-                showToast('กรุณาใส่ Google Apps Script Web App URL ก่อน', true);
-                return;
-            }
-
-            const payload = {
-                apiKey: apiKey,
-                categories: categories,
-                aboutInfo: aboutInfo
-            };
-
-            try {
-                // ปรับส่งด้วย POST Text Body ป้องกันติดปัญหา CORS บนบราวเซอร์อุปกรณ์อื่น
-                await fetch(sheetUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                });
-                showToast('สำรองข้อมูลลง Google ชีทเรียบร้อยแล้ว');
-            } catch (err) {
-                console.error(err);
-                showToast('เกิดข้อผิดพลาดในการสำรองข้อมูล', true);
-            }
-        }
-
-        // ปรับปรุงการดึงข้อมูลจาก Google Sheets
-        async function restoreFromSheet(silent = false) {
-            if (!sheetUrl) {
-                if (!silent) showToast('กรุณาใส่ Google Apps Script Web App URL ก่อน', true);
-                return;
-            }
-
-            if (!silent && !confirm('คุณต้องการดึงข้อมูลที่สำรองไว้ใน Google ชีทมาทับข้อมูลปัจจุบันหรือไม่?')) return;
-
-            try {
-                const response = await fetch(sheetUrl);
-                const data = await response.json();
-
-                if (data) {
-                    // 1. กู้คืน Categories
-                    if (data.categories && Array.isArray(data.categories) && data.categories.length > 0) {
-                        categories = data.categories;
-                        saveCategoriesLocallyOnly();
-                    }
-                    
-                    // 2. กู้คืน AboutUs
-                    if (data.aboutInfo && Object.keys(data.aboutInfo).length > 0) {
-                        aboutInfo = {
-                            shopName: data.aboutInfo.shopName || aboutInfo.shopName,
-                            ownerName: data.aboutInfo.ownerName || aboutInfo.ownerName,
-                            shopLogoUrl: data.aboutInfo.shopLogoUrl || aboutInfo.shopLogoUrl || aboutInfo.shopImgUrl,
-                            shopImgUrl: data.aboutInfo.shopImgUrl || aboutInfo.shopImgUrl,
-                            aboutBio: data.aboutInfo.aboutBio || aboutInfo.aboutBio,
-                            services: (data.aboutInfo.services && data.aboutInfo.services.length > 0) ? data.aboutInfo.services : aboutInfo.services
-                        };
-                        
-                        localStorage.setItem('photo_portfolio_about', JSON.stringify(aboutInfo));
-                        
-                        if (document.getElementById('adminShopName')) document.getElementById('adminShopName').value = aboutInfo.shopName;
-                        if (document.getElementById('adminOwnerName')) document.getElementById('adminOwnerName').value = aboutInfo.ownerName;
-                        if (document.getElementById('adminShopLogoUrl')) document.getElementById('adminShopLogoUrl').value = aboutInfo.shopLogoUrl;
-                        if (document.getElementById('adminShopImgUrl')) document.getElementById('adminShopImgUrl').value = aboutInfo.shopImgUrl;
-                        if (document.getElementById('adminAboutBio')) document.getElementById('adminAboutBio').value = aboutInfo.aboutBio;
-
-                        renderAboutInfo();
-                        renderAdminServicesList();
-                    }
-
-                    // 3. กู้คืน API Key
-                    if (data.apiKey) {
-                        apiKey = data.apiKey;
-                        if (document.getElementById('apiKeyInput')) document.getElementById('apiKeyInput').value = apiKey;
-                        localStorage.setItem('photo_portfolio_api_key', apiKey);
-                    }
-
-                    renderCategories();
-                    renderAdminCategoryList();
-                    loadActiveImages();
-                    
-                    if (!silent) showToast('ดึงข้อมูลกู้คืนจาก Google ชีทสำเร็จ');
-                } else {
-                    if (!silent) showToast('ไม่พบข้อมูลสำรองใน Google ชีท', true);
-                }
-            } catch (err) {
-                console.error(err);
-                if (!silent) showToast('เกิดข้อผิดพลาดในการดึงข้อมูลจาก Google ชีท', true);
-            }
-        }
-
-        function saveCategoriesLocallyOnly() {
-            localStorage.setItem('photo_portfolio_categories_v2', JSON.stringify(categories));
-        }
-
-        function saveCategories() {
-            saveCategoriesLocallyOnly();
-            if (sheetUrl) {
-                backupToSheet();
             }
         }
 
