@@ -525,6 +525,36 @@
             });
         });
 
+        // ฟังก์ชันเมื่อลูกค้าคลิกที่การ์ดบริการ จะพาไปยังหมวดหมู่ที่มีชื่อเดียวกัน
+        function navigateToServiceCategory(serviceTitle) {
+            if (!serviceTitle) return;
+            const cleanTitle = serviceTitle.trim().toLowerCase();
+
+            // 1. ค้นหาในหมวดหมู่หลักก่อน
+            const targetCat = categories.find(c => c.name.trim().toLowerCase() === cleanTitle || c.id === cleanTitle);
+            if (targetCat) {
+                selectCategory(targetCat.id);
+                showToast(`เปิดหมวดหมู่ "${targetCat.name}" เรียบร้อยแล้ว`);
+                return;
+            }
+
+            // 2. ถ้าไม่พบ ให้ค้นหาในหมวดหมู่ย่อย
+            for (let cat of categories) {
+                if (cat.subcategories && cat.subcategories.length > 0) {
+                    const targetSub = cat.subcategories.find(s => s.name.trim().toLowerCase() === cleanTitle || s.id === cleanTitle);
+                    if (targetSub) {
+                        activeCategoryId = cat.id;
+                        selectSubcategory(targetSub.id);
+                        showToast(`เปิดหมวดหมู่ย่อย "${targetSub.name}" เรียบร้อยแล้ว`);
+                        return;
+                    }
+                }
+            }
+
+            // 3. กรณีหาหมวดหมู่ไม่พบ
+            showToast(`ไม่พบหมวดหมู่ที่ตรงกับชื่อบริการ "${serviceTitle}"`, true);
+        }
+
         function renderAdminServicesList() {
             const container = document.getElementById('adminServicesList');
             const svcs = aboutInfo.services || [];
@@ -537,7 +567,7 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <div>
-                            <label class="block text-[10px] text-neutral-500 mb-0.5">ชื่อบริการ:</label>
+                            <label class="block text-[10px] text-neutral-500 mb-0.5">ชื่อบริการ (ตรงกับชื่อหมวดหมู่):</label>
                             <input type="text" id="svc_title_${index}" value="${escapeHtml(svc.title)}" placeholder="ชื่อบริการ" class="w-full bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
                         </div>
                         <div>
@@ -613,15 +643,26 @@
             container.innerHTML = svcs.map((svc) => {
                 let svcImg = formatImageUrl(svc.imgUrl);
                 return `
-                    <div class="bg-neutral-950/90 border border-neutral-800 rounded-2xl overflow-hidden group hover:border-neutral-700 transition flex flex-col justify-between">
+                    <div 
+                        onclick="navigateToServiceCategory('${escapeHtml(svc.title)}')"
+                        class="bg-neutral-950/90 border border-neutral-800 hover:border-amber-500/60 rounded-2xl overflow-hidden group transition duration-300 cursor-pointer flex flex-col justify-between shadow-lg hover:shadow-amber-500/10 active:scale-[0.98]"
+                    >
                         ${svcImg ? `
                             <div class="aspect-[16/9] overflow-hidden bg-neutral-900 relative">
                                 <img src="${svcImg}" alt="${escapeHtml(svc.title)}" onerror="this.src='${DEFAULT_LOGO_URL}'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <button onclick="openCustomSingleImage('${svcImg}', '${escapeHtml(svc.title)}')" class="absolute bottom-2 right-2 bg-neutral-950/80 backdrop-blur-md text-[10px] text-neutral-300 px-2 py-1 rounded-lg border border-neutral-800 hover:text-white">🔍 ขยายภาพ</button>
+                                <button 
+                                    onclick="event.stopPropagation(); openCustomSingleImage('${svcImg}', '${escapeHtml(svc.title)}')" 
+                                    class="absolute bottom-2 right-2 bg-neutral-950/80 backdrop-blur-md text-[10px] text-neutral-300 px-2 py-1 rounded-lg border border-neutral-800 hover:text-white"
+                                >
+                                    🔍 ขยายภาพ
+                                </button>
                             </div>
                         ` : ''}
-                        <div class="p-3 space-y-1">
-                            <h4 class="text-xs font-bold text-amber-300">${escapeHtml(svc.title)}</h4>
+                        <div class="p-3 space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-xs font-bold text-amber-300 group-hover:text-amber-400 transition">${escapeHtml(svc.title)}</h4>
+                                <span class="text-[10px] text-neutral-500 group-hover:text-amber-300 transition">ดูเพิ่มเติม ➔</span>
+                            </div>
                             <p class="text-[11px] text-neutral-400 font-light leading-relaxed">${escapeHtml(svc.desc)}</p>
                         </div>
                     </div>
