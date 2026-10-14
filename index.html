@@ -396,11 +396,20 @@
 
         const ADMIN_PASSWORD = "037cafe";
 
+        // อ่าน URL Parameter ลำดับแรก ถ้ามีแชร์ URL เข้ามาจากเครื่องอื่น
+        const urlParams = new URLSearchParams(window.location.search);
+        let urlSheetParam = urlParams.get('sheetUrl') || urlParams.get('scriptUrl');
+
         let categories = JSON.parse(localStorage.getItem('photo_portfolio_categories_v2')) || DEFAULT_CATEGORIES;
         let aboutInfo = JSON.parse(localStorage.getItem('photo_portfolio_about')) || DEFAULT_ABOUT;
         let apiKey = localStorage.getItem('photo_portfolio_api_key') || '';
-        let sheetUrl = localStorage.getItem('photo_portfolio_sheet_url') || '';
+        let sheetUrl = urlSheetParam || localStorage.getItem('photo_portfolio_sheet_url') || '';
         
+        // หากส่ง sheetUrl มาทาง URL Parameter ให้บันทึกไว้ใช้งานทันที
+        if (urlSheetParam) {
+            localStorage.setItem('photo_portfolio_sheet_url', urlSheetParam);
+        }
+
         let { activeCategoryId, activeSubcategoryId } = getInitialCategoryState();
         let loadedImages = [];
         let currentLightboxIndex = 0;
@@ -417,7 +426,6 @@
             if (!input || !input.trim()) return 'https://lh3.googleusercontent.com/d/1XSmT1Bl_WFTSVFyB6Thh8-gDNTTfkX72';
             let str = input.trim();
             
-            // หากเป็น URL ตรงๆ ที่ไม่ใช่ google drive ให้ส่งค่ากลับทันที
             if (str.startsWith('http') && !str.includes('drive.google.com') && !str.includes('lh3.googleusercontent.com')) {
                 return str;
             }
@@ -432,7 +440,7 @@
             } else if (str.includes('/d/')) {
                 fileId = str.split('/d/')[1].split('/')[0].split('?')[0];
             } else {
-                fileId = str; // ในกรณีที่ใส่ ID มาตรงๆ
+                fileId = str;
             }
 
             return fileId ? `https://lh3.googleusercontent.com/d/${fileId}` : str;
@@ -472,31 +480,25 @@
             return { activeCategoryId: catId, activeSubcategoryId: subId };
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('apiKeyInput').value = apiKey;
             document.getElementById('sheetUrlInput').value = sheetUrl;
-            
-            // Populate Admin About Inputs
-            document.getElementById('adminShopName').value = aboutInfo.shopName || '';
-            document.getElementById('adminOwnerName').value = aboutInfo.ownerName || '';
-            document.getElementById('adminShopLogoUrl').value = aboutInfo.shopLogoUrl || aboutInfo.shopImgUrl || '';
-            document.getElementById('adminShopImgUrl').value = aboutInfo.shopImgUrl || '';
-            document.getElementById('adminAboutBio').value = aboutInfo.aboutBio || '';
 
-            renderAdminServicesList();
-            renderAboutInfo();
+            // หากมี Web App URL ตั้งไว้แล้ว ให้ดึงข้อมูลล่าสุดจาก Cloud มาอัปเดตให้อุปกรณ์นี้ก่อนเสมอ
+            if (sheetUrl) {
+                await restoreFromSheet(true);
+            } else {
+                // ถ้าไม่มีข้อมูล ให้เรนเดอร์ข้อมูล LocalStorage / Default เดิม
+                renderAdminServicesList();
+                renderAboutInfo();
+                renderCategories();
+                renderAdminCategoryList();
+                loadActiveImages();
+            }
 
             const initialSliderVal = window.innerWidth < 640 ? 2 : 4;
             document.getElementById('gridSlider').value = initialSliderVal;
             updateGridCols(initialSliderVal);
-
-            renderCategories();
-            renderAdminCategoryList();
-            loadActiveImages();
-
-            if (sheetUrl && (!categories || categories.length === 0)) {
-                restoreFromSheet(true);
-            }
 
             const touchArea = document.getElementById('lightboxTouchArea');
             touchArea.addEventListener('touchstart', (e) => {
@@ -595,7 +597,6 @@
             document.getElementById('displayOwnerName').innerText = aboutInfo.ownerName ? `บริหารงานโดย ${aboutInfo.ownerName}` : '';
             document.getElementById('displayAboutBio').innerText = aboutInfo.aboutBio || '';
             
-            // แยกโลโก้ร้าน และภาพแนะนำตัวบรรยากาศร้าน
             let formattedLogoUrl = formatImageUrl(aboutInfo.shopLogoUrl || aboutInfo.shopImgUrl);
             let formattedImgUrl = formatImageUrl(aboutInfo.shopImgUrl);
 
@@ -603,7 +604,6 @@
             document.getElementById('aboutSectionLogo').src = formattedLogoUrl;
             document.getElementById('headerLogoImg').src = formattedLogoUrl;
 
-            // Render Dynamic Services Cards
             const svcs = aboutInfo.services || DEFAULT_ABOUT.services;
             const container = document.getElementById('servicesContainer');
 
@@ -637,14 +637,12 @@
         }
 
         function saveAboutInfo() {
-            // อ่านข้อมูลจากอินพุตหน้าหลัก
             aboutInfo.shopName = document.getElementById('adminShopName').value.trim();
             aboutInfo.ownerName = document.getElementById('adminOwnerName').value.trim();
             aboutInfo.shopLogoUrl = document.getElementById('adminShopLogoUrl').value.trim();
             aboutInfo.shopImgUrl = document.getElementById('adminShopImgUrl').value.trim();
             aboutInfo.aboutBio = document.getElementById('adminAboutBio').value.trim();
             
-            // อ่านข้อมูลจากรายการบริการทั้งหมดใน DOM
             if (!aboutInfo.services) aboutInfo.services = [];
             let updatedServices = [];
             
@@ -663,13 +661,11 @@
             }
             aboutInfo.services = updatedServices;
 
-            // บันทึกลง LocalStorage และแสดงผล
             localStorage.setItem('photo_portfolio_about', JSON.stringify(aboutInfo));
             renderAboutInfo();
             renderAdminServicesList();
             showToast('บันทึกข้อมูลแนะนำตัว & รายละเอียดบริการเรียบร้อยแล้ว');
             
-            // ซิงค์ไปยัง Google Sheets
             if (sheetUrl) backupToSheet();
         }
 
@@ -722,6 +718,10 @@
                 url.searchParams.delete('sub');
             }
 
+            if (sheetUrl) {
+                url.searchParams.set('sheetUrl', sheetUrl);
+            }
+
             const title = currentSub ? `${currentCat?.name} > ${currentSub.name}` : currentCat?.name;
             copyToClipboard(url.toString(), `คัดลอกลิงก์ "${title || ''}" เรียบร้อยแล้ว`);
         }
@@ -736,6 +736,10 @@
                 url.searchParams.set('sub', subId);
             } else {
                 url.searchParams.delete('sub');
+            }
+
+            if (sheetUrl) {
+                url.searchParams.set('sheetUrl', sheetUrl);
             }
 
             const title = sub ? `${cat?.name} > ${sub.name}` : cat?.name;
@@ -850,7 +854,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                showToast('สำรองข้อมูลลง Google ชีทเรียบร้อยแล้ว');
+                showToast('สำรองและซิงค์ข้อมูลลง Google ชีทเรียบร้อยแล้ว');
             } catch (err) {
                 console.error(err);
                 showToast('เกิดข้อผิดพลาดในการสำรองข้อมูล', true);
@@ -870,10 +874,8 @@
                 const data = await response.json();
 
                 if (data && data.categories) {
-                    // ดึง categories
                     categories = data.categories;
                     
-                    // ดึงข้อมูล AboutUs และตรวจสอบว่ามีข้อมูลจริงก่อนเขียนทับ เพื่อป้องกันค่าหาย/รีเซ็ต
                     if (data.aboutInfo && Object.keys(data.aboutInfo).length > 0) {
                         aboutInfo = {
                             shopName: data.aboutInfo.shopName || aboutInfo.shopName,
@@ -886,7 +888,6 @@
                         
                         localStorage.setItem('photo_portfolio_about', JSON.stringify(aboutInfo));
                         
-                        // อัปเดตอินพุตในหน้า Admin
                         if (document.getElementById('adminShopName')) document.getElementById('adminShopName').value = aboutInfo.shopName;
                         if (document.getElementById('adminOwnerName')) document.getElementById('adminOwnerName').value = aboutInfo.ownerName;
                         if (document.getElementById('adminShopLogoUrl')) document.getElementById('adminShopLogoUrl').value = aboutInfo.shopLogoUrl;
@@ -899,7 +900,7 @@
 
                     if (data.apiKey) {
                         apiKey = data.apiKey;
-                        document.getElementById('apiKeyInput').value = apiKey;
+                        if (document.getElementById('apiKeyInput')) document.getElementById('apiKeyInput').value = apiKey;
                         localStorage.setItem('photo_portfolio_api_key', apiKey);
                     }
 
