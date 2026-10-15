@@ -6,9 +6,10 @@
     <title>037Studio - Cafe Studio & Photography Portfolio</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts (Kanit & Inter) -->
+    <!-- Google Fonts & Preconnect Domains for Speed -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://lh3.googleusercontent.com">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -47,7 +48,7 @@
         <div class="max-w-7xl mx-auto px-4 py-3 sm:py-4 flex justify-between items-center">
             <div class="flex items-center space-x-2.5 cursor-pointer" onclick="resetToHome()">
                 <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center overflow-hidden shrink-0">
-                    <img id="headerLogoImg" src="https://lh3.googleusercontent.com/d/13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL" alt="037Studio Logo" class="w-full h-full object-cover">
+                    <img id="headerLogoImg" src="https://lh3.googleusercontent.com/d/13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL" alt="037Studio Logo" class="w-full h-full object-cover" decoding="async">
                 </div>
                 <div>
                     <h1 id="headerShopTitle" class="text-base sm:text-lg font-bold tracking-widest uppercase text-white leading-tight">037Studio</h1>
@@ -222,7 +223,7 @@
                 <div class="flex items-center gap-3 cursor-pointer" onclick="toggleAboutCollapse()">
                     <!-- Custom Logo Img -->
                     <div class="w-10 h-10 rounded-2xl bg-neutral-950 border border-amber-500/30 overflow-hidden flex items-center justify-center shrink-0 shadow-inner">
-                        <img id="aboutSectionLogo" src="https://lh3.googleusercontent.com/d/13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL" alt="037Studio Logo" class="w-full h-full object-cover">
+                        <img id="aboutSectionLogo" src="https://lh3.googleusercontent.com/d/13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL" alt="037Studio Logo" class="w-full h-full object-cover" decoding="async">
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
@@ -246,7 +247,7 @@
                 <div class="pt-5 mt-4 border-t border-neutral-800/80 flex flex-col md:flex-row items-center gap-6">
                     <!-- ฝั่งซ้าย: รูปบรรยากาศร้าน -->
                     <div class="w-full md:w-5/12 aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-950 border border-neutral-800 relative group shrink-0 shadow-lg">
-                        <img id="displayShopImg" src="https://lh3.googleusercontent.com/d/13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL" alt="บรรยากาศร้าน 037Studio" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <img id="displayShopImg" src="https://lh3.googleusercontent.com/d/13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL" alt="บรรยากาศร้าน 037Studio" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" decoding="async">
                         <div class="absolute top-3 left-3 bg-neutral-950/80 backdrop-blur-md border border-neutral-800 px-3 py-1 rounded-full flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                             <span class="text-[10px] font-medium text-neutral-300">Open Studio</span>
@@ -330,7 +331,7 @@
                 ❮
             </button>
 
-            <img id="lightboxImg" src="" alt="Full view" class="max-w-full max-h-[80vh] sm:max-h-[85vh] object-contain rounded-lg shadow-2xl transition-all duration-200">
+            <img id="lightboxImg" src="" alt="Full view" class="max-w-full max-h-[80vh] sm:max-h-[85vh] object-contain rounded-lg shadow-2xl transition-all duration-200" decoding="async">
 
             <button onclick="nextLightboxImage()" class="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-neutral-900/70 border border-neutral-800 p-3 rounded-full text-lg z-10 transition active:scale-95">
                 ❯
@@ -415,6 +416,9 @@
         let isPackageExpanded = false;
         let isAboutExpanded = false;
 
+        // In-memory cache for loaded images by folder
+        const folderImageCache = new Map();
+
         let touchStartX = 0;
         let touchEndX = 0;
 
@@ -476,19 +480,20 @@
             return { activeCategoryId: catId, activeSubcategoryId: subId };
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('apiKeyInput').value = apiKey;
             document.getElementById('sheetUrlInput').value = sheetUrl;
 
-            // ดึงข้อมูลอัตโนมัติจาก Google ชีททันทีเมื่อเปิดหน้าเว็บ
+            // Render UI immediately using local data for speed
+            renderAdminServicesList();
+            renderAboutInfo();
+            renderCategories();
+            renderAdminCategoryList();
+            loadActiveImages();
+
+            // Background restore from Google Sheet without blocking initial render
             if (sheetUrl) {
-                await restoreFromSheet(true);
-            } else {
-                renderAdminServicesList();
-                renderAboutInfo();
-                renderCategories();
-                renderAdminCategoryList();
-                loadActiveImages();
+                restoreFromSheet(true);
             }
 
             const initialSliderVal = window.innerWidth < 640 ? 2 : 4;
@@ -673,7 +678,7 @@
                     >
                         ${svcImg ? `
                             <div class="aspect-[16/9] overflow-hidden bg-neutral-900 relative">
-                                <img src="${svcImg}" alt="${escapeHtml(svc.title)}" onerror="this.src='${DEFAULT_LOGO_URL}'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <img src="${svcImg}" alt="${escapeHtml(svc.title)}" onerror="this.src='${DEFAULT_LOGO_URL}'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" decoding="async">
                                 <button 
                                     onclick="event.stopPropagation(); openCustomSingleImage('${svcImg}', '${escapeHtml(svc.title)}')" 
                                     class="absolute bottom-2 right-2 bg-neutral-950/80 backdrop-blur-md text-[10px] text-neutral-300 px-2 py-1 rounded-lg border border-neutral-800 hover:text-white"
@@ -736,6 +741,7 @@
             const key = document.getElementById('apiKeyInput').value.trim();
             apiKey = key;
             localStorage.setItem('photo_portfolio_api_key', key);
+            folderImageCache.clear(); // Clear cache when API key changes
             showToast('บันทึก API Key เรียบร้อยแล้ว');
             saveCategories();
             loadActiveImages();
@@ -1208,6 +1214,7 @@
         function updateFolderId(id, value) {
             const cleanId = extractFolderId(value);
             categories = categories.map(cat => cat.id === id ? { ...cat, folderId: cleanId } : cat);
+            folderImageCache.delete(cleanId);
             saveCategories();
             if (activeCategoryId === id && !activeSubcategoryId) loadActiveImages();
         }
@@ -1221,6 +1228,7 @@
                 }
                 return cat;
             });
+            folderImageCache.delete(cleanId);
             saveCategories();
             if (activeCategoryId === catId && activeSubcategoryId === subId) loadActiveImages();
         }
@@ -1307,6 +1315,28 @@
             }
         }
 
+        function renderImageGrid(images) {
+            const imageGrid = document.getElementById('imageGrid');
+            imageGrid.innerHTML = images.map((img, index) => `
+                <div 
+                    onclick="openLightbox(${index})"
+                    class="group relative aspect-[3/4] bg-neutral-900 rounded-lg sm:rounded-2xl overflow-hidden cursor-pointer border border-neutral-800/80 active:scale-95 transition-all duration-200 shadow-md"
+                >
+                    <img 
+                        src="${img.gridSrc}" 
+                        alt="${escapeHtml(img.name)}" 
+                        loading="lazy"
+                        decoding="async"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 sm:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-1.5 sm:p-4">
+                        ${img.subcategoryName ? `<span class="text-[8px] sm:text-[10px] text-neutral-400 uppercase tracking-wider font-semibold truncate">${escapeHtml(img.subcategoryName)}</span>` : ''}
+                        <span class="text-[10px] sm:text-xs text-neutral-200 font-light truncate">${escapeHtml(img.name)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         async function loadActiveImages() {
             const imageGrid = document.getElementById('imageGrid');
             const currentCat = categories.find(c => c.id === activeCategoryId);
@@ -1343,19 +1373,45 @@
                 return;
             }
 
+            // Check in-memory cache first for instant performance
+            let allFiles = [];
+            let uncashedFolders = [];
+
+            for (let item of folderIdsToLoad) {
+                if (folderImageCache.has(item.folderId)) {
+                    const cachedFiles = folderImageCache.get(item.folderId);
+                    allFiles = allFiles.concat(cachedFiles.map(f => ({ ...f, subcategoryName: item.name })));
+                } else {
+                    uncashedFolders.push(item);
+                }
+            }
+
+            // If all folders are cached, display immediately
+            if (uncashedFolders.length === 0) {
+                hideStatus();
+                loadedImages = allFiles.map(file => {
+                    const gridSrc = file.thumbnailLink ? file.thumbnailLink.replace(/=s\d+/, '=s800') : `https://lh3.googleusercontent.com/d/${file.id}`;
+                    const fullSrc = file.thumbnailLink ? file.thumbnailLink.replace(/=s\d+/, '=s2048') : `https://lh3.googleusercontent.com/d/${file.id}`;
+                    return { id: file.id, name: file.name, subcategoryName: file.subcategoryName, gridSrc, fullSrc };
+                });
+                renderImageGrid(loadedImages);
+                return;
+            }
+
             showStatus('กำลังโหลดรูปภาพจาก Google Drive...', true);
 
             try {
-                let allFiles = [];
-
-                const fetchPromises = folderIdsToLoad.map(async (item) => {
+                const fetchPromises = uncashedFolders.map(async (item) => {
                     const q = `'${item.folderId}' in parents and mimeType contains 'image/' and trashed = false`;
                     const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,thumbnailLink)&key=${apiKey}`;
 
                     const response = await fetch(url);
                     const data = await response.json();
 
-                    if (data.files) return data.files.map(f => ({ ...f, subcategoryName: item.name }));
+                    if (data.files) {
+                        folderImageCache.set(item.folderId, data.files);
+                        return data.files.map(f => ({ ...f, subcategoryName: item.name }));
+                    }
                     return [];
                 });
 
@@ -1376,23 +1432,7 @@
                     return { id: file.id, name: file.name, subcategoryName: file.subcategoryName, gridSrc, fullSrc };
                 });
 
-                imageGrid.innerHTML = loadedImages.map((img, index) => `
-                    <div 
-                        onclick="openLightbox(${index})"
-                        class="group relative aspect-[3/4] bg-neutral-900 rounded-lg sm:rounded-2xl overflow-hidden cursor-pointer border border-neutral-800/80 active:scale-95 transition-all duration-200 shadow-md"
-                    >
-                        <img 
-                            src="${img.gridSrc}" 
-                            alt="${escapeHtml(img.name)}" 
-                            loading="lazy"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        >
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 sm:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-1.5 sm:p-4">
-                            ${img.subcategoryName ? `<span class="text-[8px] sm:text-[10px] text-neutral-400 uppercase tracking-wider font-semibold truncate">${escapeHtml(img.subcategoryName)}</span>` : ''}
-                            <span class="text-[10px] sm:text-xs text-neutral-200 font-light truncate">${escapeHtml(img.name)}</span>
-                        </div>
-                    </div>
-                `).join('');
+                renderImageGrid(loadedImages);
 
             } catch (err) {
                 console.error(err);
@@ -1431,6 +1471,23 @@
             if (loadedImages[currentLightboxIndex]) {
                 img.src = loadedImages[currentLightboxIndex].fullSrc;
                 counter.innerText = `${currentLightboxIndex + 1} / ${loadedImages.length}`;
+
+                // Preload adjacent lightbox images for seamless navigation
+                preloadLightboxImages(currentLightboxIndex);
+            }
+        }
+
+        function preloadLightboxImages(index) {
+            const nextIdx = (index + 1) % loadedImages.length;
+            const prevIdx = (index - 1 + loadedImages.length) % loadedImages.length;
+            
+            if (loadedImages[nextIdx]) {
+                const nextImg = new Image();
+                nextImg.src = loadedImages[nextIdx].fullSrc;
+            }
+            if (loadedImages[prevIdx]) {
+                const prevImg = new Image();
+                prevImg.src = loadedImages[prevIdx].fullSrc;
             }
         }
 
