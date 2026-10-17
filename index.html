@@ -1100,11 +1100,15 @@
 
         function renderAdminCategoryList() {
             const list = document.getElementById('adminCategoryList');
-            list.innerHTML = categories.map(cat => {
+            list.innerHTML = categories.map((cat, idx) => {
                 const hasSubs = cat.subcategories && cat.subcategories.length > 0;
                 return `
                 <div class="bg-neutral-950 p-3 rounded-xl border border-neutral-800/80 space-y-2.5">
                     <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button onclick="moveCategory(${idx}, -1)" ${idx === 0 ? 'disabled class="opacity-30 cursor-not-allowed text-xs bg-neutral-900 text-neutral-500 px-2 py-1 rounded-lg border border-neutral-800"' : 'class="text-xs bg-neutral-800 hover:bg-neutral-700 text-amber-400 px-2 py-1 rounded-lg border border-neutral-700 transition active:scale-95"'} title="ย้ายขึ้น">▲</button>
+                            <button onclick="moveCategory(${idx}, 1)" ${idx === categories.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed text-xs bg-neutral-900 text-neutral-500 px-2 py-1 rounded-lg border border-neutral-800"' : 'class="text-xs bg-neutral-800 hover:bg-neutral-700 text-amber-400 px-2 py-1 rounded-lg border border-neutral-700 transition active:scale-95"'} title="ย้ายลง">▼</button>
+                        </div>
                         <input 
                             type="text" 
                             value="${escapeHtml(cat.name)}" 
@@ -1135,9 +1139,13 @@
 
                     ${hasSubs ? `
                         <div class="pl-3 border-l-2 border-neutral-800 space-y-2 pt-1">
-                            ${cat.subcategories.map(sub => `
+                            ${cat.subcategories.map((sub, subIdx) => `
                                 <div class="bg-neutral-900/60 p-2.5 rounded-lg border border-neutral-800/50 space-y-2">
                                     <div class="flex flex-col sm:flex-row gap-1.5 items-stretch sm:items-center">
+                                        <div class="flex items-center gap-1 shrink-0">
+                                            <button onclick="moveSubcategory('${cat.id}', ${subIdx}, -1)" ${subIdx === 0 ? 'disabled class="opacity-30 cursor-not-allowed text-[10px] bg-neutral-950 text-neutral-600 px-1.5 py-0.5 rounded border border-neutral-900"' : 'class="text-[10px] bg-neutral-800 hover:bg-neutral-700 text-amber-400 px-1.5 py-0.5 rounded border border-neutral-700 transition active:scale-95"'} title="ย้ายหมวดหมู่ย่อยขึ้น">▲</button>
+                                            <button onclick="moveSubcategory('${cat.id}', ${subIdx}, 1)" ${subIdx === cat.subcategories.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed text-[10px] bg-neutral-950 text-neutral-600 px-1.5 py-0.5 rounded border border-neutral-900"' : 'class="text-[10px] bg-neutral-800 hover:bg-neutral-700 text-amber-400 px-1.5 py-0.5 rounded border border-neutral-700 transition active:scale-95"'} title="ย้ายหมวดหมู่ย่อยลง">▼</button>
+                                        </div>
                                         <input 
                                             type="text" 
                                             value="${escapeHtml(sub.name)}" 
@@ -1169,6 +1177,39 @@
                     ` : ''}
                 </div>
             `}).join('');
+        }
+
+        // ฟังก์ชันปรับย้ายตำแหน่งหมวดหมู่หลัก
+        function moveCategory(index, direction) {
+            const targetIndex = index + direction;
+            if (targetIndex < 0 || targetIndex >= categories.length) return;
+            
+            const temp = categories[index];
+            categories[index] = categories[targetIndex];
+            categories[targetIndex] = temp;
+            
+            saveCategories();
+            renderCategories();
+            renderAdminCategoryList();
+            showToast('ปรับย้ายลำดับหมวดหมู่หลักเรียบร้อยแล้ว');
+        }
+
+        // ฟังก์ชันปรับย้ายตำแหน่งหมวดหมู่ย่อย
+        function moveSubcategory(catId, subIndex, direction) {
+            const cat = categories.find(c => c.id === catId);
+            if (!cat || !cat.subcategories) return;
+
+            const targetIndex = subIndex + direction;
+            if (targetIndex < 0 || targetIndex >= cat.subcategories.length) return;
+
+            const temp = cat.subcategories[subIndex];
+            cat.subcategories[subIndex] = cat.subcategories[targetIndex];
+            cat.subcategories[targetIndex] = temp;
+
+            saveCategories();
+            renderCategories();
+            renderAdminCategoryList();
+            showToast('ปรับย้ายลำดับหมวดหมู่ย่อยเรียบร้อยแล้ว');
         }
 
         function updateCategoryName(id, newName) {
