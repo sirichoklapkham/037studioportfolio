@@ -33,6 +33,14 @@
         .animate-cta {
             animation: subtlePulse 2.5s infinite ease-in-out;
         }
+        /* Style for smooth drag scrolling on desktop */
+        .scroll-container {
+            cursor: grab;
+            user-select: none;
+        }
+        .scroll-container:active {
+            cursor: grabbing;
+        }
     </style>
 </head>
 <body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col selection:bg-neutral-800 selection:text-white overflow-x-hidden">
@@ -67,8 +75,20 @@
 
         <!-- Category & Controls Bar -->
         <div class="max-w-7xl mx-auto px-4 pb-2.5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-            <div id="categoryContainer" class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-4 px-4 sm:mx-0 sm:px-0">
-                <!-- Main Categories injected dynamically -->
+            
+            <!-- Category Navigation Container with Desktop Scroll Buttons -->
+            <div class="relative flex items-center flex-1 min-w-0 pr-0 sm:pr-4">
+                <button onclick="scrollCategory('categoryContainer', -200)" class="hidden sm:flex shrink-0 z-10 p-1.5 mr-1 bg-neutral-900/90 hover:bg-neutral-800 text-neutral-300 rounded-full border border-neutral-800 text-xs active:scale-95 transition" title="เลื่อนซ้าย">
+                    ◄
+                </button>
+
+                <div id="categoryContainer" class="scroll-container flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth">
+                    <!-- Main Categories injected dynamically -->
+                </div>
+
+                <button onclick="scrollCategory('categoryContainer', 200)" class="hidden sm:flex shrink-0 z-10 p-1.5 ml-1 bg-neutral-900/90 hover:bg-neutral-800 text-neutral-300 rounded-full border border-neutral-800 text-xs active:scale-95 transition" title="เลื่อนขวา">
+                    ►
+                </button>
             </div>
             
             <div class="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-1 sm:pt-0 border-t sm:border-0 border-neutral-900">
@@ -91,9 +111,18 @@
         <div id="subcategoryBar" class="hidden max-w-7xl mx-auto px-4 pb-2.5 pt-1.5 border-t border-neutral-900">
             <div class="flex items-center gap-2">
                 <span class="text-[10px] text-neutral-500 uppercase tracking-wider shrink-0 font-medium">ย่อย:</span>
-                <div id="subcategoryContainer" class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-4 px-4 sm:mx-0 sm:px-0">
+                
+                <button onclick="scrollCategory('subcategoryContainer', -150)" class="hidden sm:flex shrink-0 z-10 p-1 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 rounded-full border border-neutral-800 text-[10px] active:scale-95 transition">
+                    ◄
+                </button>
+
+                <div id="subcategoryContainer" class="scroll-container flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth">
                     <!-- Subcategories injected dynamically -->
                 </div>
+
+                <button onclick="scrollCategory('subcategoryContainer', 150)" class="hidden sm:flex shrink-0 z-10 p-1 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 rounded-full border border-neutral-800 text-[10px] active:scale-95 transition">
+                    ►
+                </button>
             </div>
         </div>
     </header>
@@ -491,6 +520,10 @@
             renderAdminCategoryList();
             loadActiveImages();
 
+            // Enable Desktop Drag & MouseWheel Scrolling for Category containers
+            setupDesktopHorizontalScroll('categoryContainer');
+            setupDesktopHorizontalScroll('subcategoryContainer');
+
             // Background restore from Google Sheet without blocking initial render
             if (sheetUrl) {
                 restoreFromSheet(true);
@@ -527,6 +560,50 @@
                 loadActiveImages();
             });
         });
+
+        // ฟังก์ชันเปิดให้คลิกลากและหมุนลูกกลิ้งเมาส์เลื่อนแถบหมวดหมู่ในหน้าจอคอมพิวเตอร์
+        function setupDesktopHorizontalScroll(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            // Mouse Drag Scroll
+            container.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - container.offsetLeft;
+                scrollLeft = container.scrollLeft;
+            });
+
+            container.addEventListener('mouseleave', () => { isDown = false; });
+            container.addEventListener('mouseup', () => { isDown = false; });
+
+            container.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - container.offsetLeft;
+                const walk = (x - startX) * 1.5; // Drag speed multiplier
+                container.scrollLeft = scrollLeft - walk;
+            });
+
+            // Mouse Wheel Horizontal Scroll
+            container.addEventListener('wheel', (e) => {
+                if (e.deltaY !== 0) {
+                    e.preventDefault();
+                    container.scrollLeft += e.deltaY;
+                }
+            }, { passive: false });
+        }
+
+        // ฟังก์ชันสำหรับการกดปุ่มลูกศรเลื่อนหมวดหมู่ในจอคอมพิวเตอร์
+        function scrollCategory(containerId, distance) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.scrollBy({ left: distance, behavior: 'smooth' });
+            }
+        }
 
         // ฟังก์ชันย่อข้อมูลร้านและเลื่อนหน้าจอลงไปยังหมวดหมู่ที่เปิด
         function collapseAboutAndScroll() {
@@ -1016,7 +1093,7 @@
             container.innerHTML = categories.map(cat => `
                 <button 
                     onclick="selectCategory('${cat.id}')"
-                    class="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 active:scale-95 ${
+                    class="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 active:scale-95 shrink-0 ${
                         activeCategoryId === cat.id 
                             ? 'bg-white text-black font-semibold shadow-md' 
                             : 'bg-neutral-900 text-neutral-400 border border-neutral-800'
@@ -1034,7 +1111,7 @@
                 subContainer.innerHTML = `
                     <button 
                         onclick="selectSubcategory(null)"
-                        class="px-2.5 py-1 rounded-lg text-[11px] transition whitespace-nowrap active:scale-95 ${
+                        class="px-2.5 py-1 rounded-lg text-[11px] transition whitespace-nowrap active:scale-95 shrink-0 ${
                             !activeSubcategoryId 
                                 ? 'bg-neutral-700 text-white font-medium' 
                                 : 'bg-neutral-900/80 text-neutral-400 border border-neutral-800'
@@ -1045,7 +1122,7 @@
                 ` + currentCat.subcategories.map(sub => `
                     <button 
                         onclick="selectSubcategory('${sub.id}')"
-                        class="px-2.5 py-1 rounded-lg text-[11px] transition whitespace-nowrap active:scale-95 ${
+                        class="px-2.5 py-1 rounded-lg text-[11px] transition whitespace-nowrap active:scale-95 shrink-0 ${
                             activeSubcategoryId === sub.id 
                                 ? 'bg-neutral-200 text-black font-medium' 
                                 : 'bg-neutral-900/80 text-neutral-400 border border-neutral-800'
