@@ -3,7 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>037Studio - Cafe Studio & Photography Portfolio</title>
+    <title id="metaTitle">037Studio - Cafe Studio & Photography Portfolio</title>
+    
+    <!-- Open Graph & Social Preview Meta Tags (Dynamic) -->
+    <meta id="ogTitle" property="og:title" content="037Studio - Cafe Studio & Photography Portfolio">
+    <meta id="ogDesc" property="og:description" content="สตูดิโอถ่ายภาพและคาเฟ่ บรรยากาศเป็นกันเอง พร้อมสร้างสรรค์ผลงานคุณภาพด้วยอุปกรณ์มาตรฐานระดับมืออาชีพ">
+    <meta id="ogImage" property="og:image" content="https://lh3.googleusercontent.com/d/13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL">
+    <meta id="ogUrl" property="og:url" content="">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta id="twTitle" name="twitter:title" content="037Studio - Cafe Studio & Photography Portfolio">
+    <meta id="twDesc" name="twitter:description" content="สตูดิโอถ่ายภาพและคาเฟ่ บรรยากาศเป็นกันเอง">
+    <meta id="twImage" name="twitter:image" content="https://lh3.googleusercontent.com/d/13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts & Preconnect Domains for Speed -->
@@ -308,21 +320,35 @@
             <h2 id="activeCategoryTitle" class="text-lg sm:text-2xl font-bold tracking-wide text-white">ผลงาน</h2>
         </div>
 
-        <!-- Collapsible Package Details & Pricing Display Card -->
+        <!-- Collapsible Package Details & Pricing Display Card with Cover Image -->
         <div id="packageCard" class="hidden bg-gradient-to-r from-neutral-900/90 to-neutral-900/40 border border-neutral-800/90 rounded-2xl p-4 sm:p-5 backdrop-blur-sm relative overflow-hidden transition-all duration-300">
             <div class="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none"></div>
-            <div class="flex items-start gap-3">
-                <div class="p-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-xl text-base sm:text-lg shrink-0 mt-0.5">
-                    🏷️
+            
+            <div class="flex flex-col md:flex-row items-start gap-4">
+                <!-- Cover Image Preview -->
+                <div id="packageCoverContainer" class="hidden w-full md:w-48 aspect-[16/10] md:aspect-[4/3] rounded-xl overflow-hidden bg-neutral-950 border border-neutral-800/80 shrink-0 relative group">
+                    <img id="packageCoverImg" src="" alt="ภาพปกหมวดหมู่" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" decoding="async">
+                    <button onclick="zoomCoverImage()" class="absolute bottom-2 right-2 bg-neutral-950/80 backdrop-blur-md text-[10px] text-neutral-300 px-2 py-1 rounded-lg border border-neutral-800 hover:text-white">
+                        🔍 ขยายภาพปก
+                    </button>
                 </div>
-                <div class="space-y-1.5 w-full">
+
+                <div class="space-y-1.5 w-full flex-1">
                     <div class="flex justify-between items-center cursor-pointer" onclick="togglePackageCollapse()">
-                        <h3 class="text-xs sm:text-sm font-bold text-amber-300 tracking-wide uppercase">แพ็คเกจราคา & รายละเอียด</h3>
-                        <button id="packageToggleBtn" class="text-[11px] text-neutral-400 hover:text-amber-300 font-medium px-2 py-0.5 rounded-md bg-neutral-800/80 border border-neutral-700/60 transition">
-                            ▼ อ่านเพิ่มเติม
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <span class="p-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-lg text-xs sm:text-sm">🏷️</span>
+                            <h3 class="text-xs sm:text-sm font-bold text-amber-300 tracking-wide uppercase">แพ็คเกจราคา & รายละเอียด</h3>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="event.stopPropagation(); copyCurrentCategoryLink()" class="text-[11px] text-amber-400 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 px-2.5 py-1 rounded-lg font-medium transition active:scale-95 flex items-center gap-1">
+                                <span>🔗</span> คัดลอกลิงก์
+                            </button>
+                            <button id="packageToggleBtn" class="text-[11px] text-neutral-400 hover:text-amber-300 font-medium px-2 py-0.5 rounded-md bg-neutral-800/80 border border-neutral-700/60 transition">
+                                ▼ อ่านเพิ่มเติม
+                            </button>
+                        </div>
                     </div>
-                    <div id="packageDescription" class="text-xs sm:text-sm text-neutral-300 whitespace-pre-line leading-relaxed font-light overflow-hidden transition-all duration-300 max-h-16 relative">
+                    <div id="packageDescription" class="text-xs sm:text-sm text-neutral-300 whitespace-pre-line leading-relaxed font-light overflow-hidden transition-all duration-300 max-h-16 relative pt-1">
                         <!-- Dynamic details injected here -->
                     </div>
                 </div>
@@ -382,24 +408,25 @@
         const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwAMS0xqSV-9t9com4LFQzcRZ7rHwNMp-GHkJyy-kU6YaYCEpTNR40io5fz__sGkZIm8g/exec';
 
         const DEFAULT_CATEGORIES = [
-            { id: 'portfolio', name: 'ผลงาน', description: 'แพ็คเกจเริ่มต้นถ่ายภาพนอกสถานที่ 3,500 บาท / 2 ชนิดรูปภาพ\n- ส่งงานไฟล์รูปปรับแสงสีทั้งหมด\n- ปรับผิวรีทัชเนียนพิเศษ 20 รูป', folderId: '', subcategories: [] },
-            { id: 'profile-studio', name: 'สตูดิโอโปรไฟล์', description: 'ถ่ายภาพสตูดิโอส่วนตัว เริ่มต้น 2,500 บาท / 1 ชม.\n- รวมปรับแต่งไฟในสตูดิโอ\n- ปรับผิวและทรงผมในรูปไฮไลท์', folderId: '', subcategories: [] },
+            { id: 'portfolio', name: 'ผลงาน', description: 'แพ็คเกจเริ่มต้นถ่ายภาพนอกสถานที่ 3,500 บาท / 2 ชนิดรูปภาพ\n- ส่งงานไฟล์รูปปรับแสงสีทั้งหมด\n- ปรับผิวรีทัชเนียนพิเศษ 20 รูป', folderId: '', coverUrl: '', subcategories: [] },
+            { id: 'profile-studio', name: 'สตูดิโอโปรไฟล์', description: 'ถ่ายภาพสตูดิโอส่วนตัว เริ่มต้น 2,500 บาท / 1 ชม.\n- รวมปรับแต่งไฟในสตูดิโอ\n- ปรับผิวและทรงผมในรูปไฮไลท์', folderId: '', coverUrl: '', subcategories: [] },
             { 
                 id: 'wedding-studio', 
                 name: 'สตูดิโอ Wedding', 
                 description: 'แพ็คเกจพรีเวดดิ้งแต่งงาน ครบวงจร เริ่มต้น 12,900 บาท\n- รวมชุดแต่งงานและแต่งหน้าทำผม\n- กรอบรูปหลุยส์ขนาดใหญ่ 20x30 นิ้ว',
                 folderId: '',
+                coverUrl: '',
                 subcategories: [
-                    { id: 'wedding-indoor', name: 'ชุดไทย / ในสตูดิโอ', description: 'ถ่ายในสตูดิโอปรับไฟสไตล์อบอุ่น 5,900 บาท (พร้อมชุดไทย)', folderId: '' },
-                    { id: 'wedding-outdoor', name: 'พรีเวดดิ้ง นอกสถานที่', description: 'ถ่ายนอกสถานที่เต็มวัน 9,900 บาท (ไม่รวมค่าสถานที่)', folderId: '' }
+                    { id: 'wedding-indoor', name: 'ชุดไทย / ในสตูดิโอ', description: 'ถ่ายในสตูดิโอปรับไฟสไตล์อบอุ่น 5,900 บาท (พร้อมชุดไทย)', folderId: '', coverUrl: '' },
+                    { id: 'wedding-outdoor', name: 'พรีเวดดิ้ง นอกสถานที่', description: 'ถ่ายนอกสถานที่เต็มวัน 9,900 บาท (ไม่รวมค่าสถานที่)', folderId: '', coverUrl: '' }
                 ]
             },
-            { id: 'couples', name: 'คู่รัก', description: '', folderId: '', subcategories: [] },
-            { id: 'friends', name: 'เพื่อนๆ', description: '', folderId: '', subcategories: [] },
-            { id: 'formal', name: 'ทางการ', description: '', folderId: '', subcategories: [] },
-            { id: 'compcard', name: 'คอมการ์ด', description: '', folderId: '', subcategories: [] },
-            { id: 'birthday', name: 'วันเกิด', description: '', folderId: '', subcategories: [] },
-            { id: 'family', name: 'ครอบครัว', description: '', folderId: '', subcategories: [] }
+            { id: 'couples', name: 'คู่รัก', description: '', folderId: '', coverUrl: '', subcategories: [] },
+            { id: 'friends', name: 'เพื่อนๆ', description: '', folderId: '', coverUrl: '', subcategories: [] },
+            { id: 'formal', name: 'ทางการ', description: '', folderId: '', coverUrl: '', subcategories: [] },
+            { id: 'compcard', name: 'คอมการ์ด', description: '', folderId: '', coverUrl: '', subcategories: [] },
+            { id: 'birthday', name: 'วันเกิด', description: '', folderId: '', coverUrl: '', subcategories: [] },
+            { id: 'family', name: 'ครอบครัว', description: '', folderId: '', coverUrl: '', subcategories: [] }
         ];
 
         const DEFAULT_ABOUT = {
@@ -948,54 +975,52 @@
         }
 
         function updateUrlCategory(catId, subId = null) {
-            const url = new URL(window.location.href);
+            const url = new URL(window.location.origin + window.location.pathname);
             url.searchParams.set('cat', catId);
             if (subId) {
                 url.searchParams.set('sub', subId);
-            } else {
-                url.searchParams.delete('sub');
             }
             window.history.pushState({ catId, subId }, '', url.toString());
         }
 
+        // คัดลอกเฉพาะ URL ลิงก์สั้นเปิดเข้าชมหมวดหมู่ได้ทันที (ไม่เอาเนื้อหาข้อความรายละเอียด)
         function copyCurrentCategoryLink() {
-            const currentCat = categories.find(c => c.id === activeCategoryId);
-            const currentSub = currentCat?.subcategories?.find(s => s.id === activeSubcategoryId);
-            
-            const url = new URL(window.location.href);
-            url.searchParams.set('cat', activeCategoryId);
-            if (activeSubcategoryId) {
-                url.searchParams.set('sub', activeSubcategoryId);
-            } else {
-                url.searchParams.delete('sub');
-            }
-
-            if (sheetUrl) {
-                url.searchParams.set('sheetUrl', sheetUrl);
-            }
-
-            const title = currentSub ? `${currentCat?.name} > ${currentSub.name}` : currentCat?.name;
-            copyToClipboard(url.toString(), `คัดลอกลิงก์ "${title || ''}" เรียบร้อยแล้ว`);
+            copyCategoryLinkById(activeCategoryId, activeSubcategoryId);
         }
 
         function copyCategoryLinkById(catId, subId = null) {
             const cat = categories.find(c => c.id === catId);
             const sub = cat?.subcategories?.find(s => s.id === subId);
             
-            const url = new URL(window.location.href);
+            const url = new URL(window.location.origin + window.location.pathname);
             url.searchParams.set('cat', catId);
             if (subId) {
                 url.searchParams.set('sub', subId);
-            } else {
-                url.searchParams.delete('sub');
-            }
-
-            if (sheetUrl) {
-                url.searchParams.set('sheetUrl', sheetUrl);
             }
 
             const title = sub ? `${cat?.name} > ${sub.name}` : cat?.name;
-            copyToClipboard(url.toString(), `คัดลอกลิงก์ "${title || ''}" เรียบร้อยแล้ว`);
+            copyToClipboard(url.toString(), `คัดลอกลิงก์หมวดหมู่ "${title || ''}" เรียบร้อยแล้ว`);
+        }
+
+        function updateOpenGraphMeta(title, description, coverUrl, currentUrl) {
+            const formattedCover = formatImageUrl(coverUrl || aboutInfo.shopImgUrl || DEFAULT_LOGO_URL);
+            const shopName = aboutInfo.shopName || '037Studio';
+            const fullTitle = `${shopName} - ${title}`;
+
+            // Update Page Title
+            document.title = fullTitle;
+            if (document.getElementById('metaTitle')) document.getElementById('metaTitle').innerText = fullTitle;
+
+            // Update OG Meta Tags
+            if (document.getElementById('ogTitle')) document.getElementById('ogTitle').setAttribute('content', fullTitle);
+            if (document.getElementById('ogDesc')) document.getElementById('ogDesc').setAttribute('content', description || 'สตูดิโอถ่ายภาพและคาเฟ่ ผลงานคุณภาพ');
+            if (document.getElementById('ogImage')) document.getElementById('ogImage').setAttribute('content', formattedCover);
+            if (document.getElementById('ogUrl')) document.getElementById('ogUrl').setAttribute('content', currentUrl);
+
+            // Update Twitter Meta Tags
+            if (document.getElementById('twTitle')) document.getElementById('twTitle').setAttribute('content', fullTitle);
+            if (document.getElementById('twDesc')) document.getElementById('twDesc').setAttribute('content', description || 'สตูดิโอถ่ายภาพและคาเฟ่ ผลงานคุณภาพ');
+            if (document.getElementById('twImage')) document.getElementById('twImage').setAttribute('content', formattedCover);
         }
 
         function copyToClipboard(text, successMessage) {
@@ -1139,6 +1164,8 @@
             const packageCard = document.getElementById('packageCard');
             const packageDescription = document.getElementById('packageDescription');
             const toggleBtn = document.getElementById('packageToggleBtn');
+            const packageCoverContainer = document.getElementById('packageCoverContainer');
+            const packageCoverImg = document.getElementById('packageCoverImg');
 
             isPackageExpanded = false;
             packageDescription.classList.remove('max-h-[1000px]');
@@ -1149,18 +1176,37 @@
                 const currentSub = currentCat.subcategories?.find(s => s.id === activeSubcategoryId);
                 
                 let descText = '';
+                let titleText = '';
+                let rawCover = '';
+
                 if (currentSub) {
                     document.getElementById('activeCategoryBreadcrumb').innerText = `CATEGORY / ${currentCat.name.toUpperCase()}`;
                     document.getElementById('activeCategoryTitle').innerText = currentSub.name;
                     descText = currentSub.description || currentCat.description || '';
+                    titleText = `${currentCat.name} > ${currentSub.name}`;
+                    rawCover = currentSub.coverUrl || currentCat.coverUrl || '';
                 } else {
                     document.getElementById('activeCategoryBreadcrumb').innerText = `PORTFOLIO`;
                     document.getElementById('activeCategoryTitle').innerText = currentCat.name;
                     descText = currentCat.description || '';
+                    titleText = currentCat.name;
+                    rawCover = currentCat.coverUrl || '';
                 }
 
-                if (descText.trim()) {
-                    packageDescription.innerText = descText;
+                // Render Cover Image Preview Card
+                let coverImgFormatted = formatImageUrl(rawCover);
+                if (rawCover && rawCover.trim() && coverImgFormatted !== DEFAULT_LOGO_URL) {
+                    packageCoverImg.src = coverImgFormatted;
+                    packageCoverContainer.classList.remove('hidden');
+                } else {
+                    packageCoverContainer.classList.add('hidden');
+                }
+
+                // Update Open Graph Meta Tags dynamically
+                updateOpenGraphMeta(titleText, descText, rawCover, window.location.href);
+
+                if (descText.trim() || (rawCover && rawCover.trim())) {
+                    packageDescription.innerText = descText || 'ไม่มีข้อมูลรายละเอียดแพ็คเกจย่อ';
                     packageCard.classList.remove('hidden');
 
                     if (descText.split('\n').length > 2 || descText.length > 80) {
@@ -1172,6 +1218,13 @@
                 } else {
                     packageCard.classList.add('hidden');
                 }
+            }
+        }
+
+        function zoomCoverImage() {
+            const packageCoverImg = document.getElementById('packageCoverImg');
+            if (packageCoverImg && packageCoverImg.src) {
+                openCustomSingleImage(packageCoverImg.src, 'ภาพปกหมวดหมู่');
             }
         }
 
@@ -1202,9 +1255,21 @@
                         />
                         <div class="flex gap-1.5 shrink-0 justify-end">
                             <button onclick="addNewSubcategory('${cat.id}')" class="text-[11px] bg-neutral-800 text-emerald-400 border border-emerald-900/30 px-2.5 py-1.5 rounded-lg">+ ย่อย</button>
-                            <button onclick="copyCategoryLinkById('${cat.id}')" class="text-[11px] bg-neutral-800 text-neutral-300 px-2.5 py-1.5 rounded-lg">🔗 ลิงก์</button>
+                            <button onclick="copyCategoryLinkById('${cat.id}')" class="text-[11px] bg-neutral-800 text-neutral-300 px-2.5 py-1.5 rounded-lg">🔗 แชร์</button>
                             <button onclick="deleteCategory('${cat.id}')" class="text-[11px] text-red-400 border border-red-900/30 bg-red-950/20 px-2.5 py-1.5 rounded-lg">ลบ</button>
                         </div>
+                    </div>
+
+                    <!-- Cover Image Input for Main Category -->
+                    <div>
+                        <label class="block text-[10px] text-amber-400 mb-0.5">🖼️ ลิงก์รูปภาพปก (Cover Image URL - Google Drive Link):</label>
+                        <input 
+                            type="text" 
+                            value="${escapeHtml(cat.coverUrl || '')}" 
+                            onchange="updateCategoryCoverUrl('${cat.id}', this.value)"
+                            placeholder="วางลิงก์ภาพปก เช่น https://drive.google.com/..."
+                            class="w-full bg-neutral-900/90 border border-neutral-800 p-1.5 rounded-lg text-xs text-amber-100 focus:outline-none"
+                        />
                     </div>
 
                     <textarea 
@@ -1238,10 +1303,23 @@
                                             class="flex-1 bg-neutral-950 border border-neutral-800 p-1.5 rounded text-xs text-neutral-200 focus:outline-none"
                                         />
                                         <div class="flex gap-1 shrink-0 justify-end">
-                                            <button onclick="copyCategoryLinkById('${cat.id}', '${sub.id}')" class="text-[10px] bg-neutral-800 text-neutral-300 px-2 py-1 rounded">🔗</button>
+                                            <button onclick="copyCategoryLinkById('${cat.id}', '${sub.id}')" class="text-[10px] bg-neutral-800 text-neutral-300 px-2 py-1 rounded">🔗 แชร์</button>
                                             <button onclick="deleteSubcategory('${cat.id}', '${sub.id}')" class="text-[10px] text-red-400 border border-red-900/30 px-2 py-1 rounded">ลบ</button>
                                         </div>
                                     </div>
+
+                                    <!-- Cover Image Input for Subcategory -->
+                                    <div>
+                                        <label class="block text-[9px] text-amber-400 mb-0.5">🖼️ ลิงก์รูปภาพปกหมวดหมู่ย่อย (Cover Image URL):</label>
+                                        <input 
+                                            type="text" 
+                                            value="${escapeHtml(sub.coverUrl || '')}" 
+                                            onchange="updateSubcategoryCoverUrl('${cat.id}', '${sub.id}', this.value)"
+                                            placeholder="วางลิงก์ภาพปกหมวดหมู่ย่อย..."
+                                            class="w-full bg-neutral-950 border border-neutral-800 p-1 rounded text-[11px] text-amber-100 focus:outline-none"
+                                        />
+                                    </div>
+
                                     <textarea 
                                         rows="1"
                                         onchange="updateSubcategoryDescription('${cat.id}', '${sub.id}', this.value)"
@@ -1254,6 +1332,24 @@
                     ` : ''}
                 </div>
             `}).join('');
+        }
+
+        function updateCategoryCoverUrl(id, value) {
+            categories = categories.map(cat => cat.id === id ? { ...cat, coverUrl: value.trim() } : cat);
+            saveCategories();
+            renderCategories();
+        }
+
+        function updateSubcategoryCoverUrl(catId, subId, value) {
+            categories = categories.map(cat => {
+                if (cat.id === catId && cat.subcategories) {
+                    const updatedSubs = cat.subcategories.map(sub => sub.id === subId ? { ...sub, coverUrl: value.trim() } : sub);
+                    return { ...cat, subcategories: updatedSubs };
+                }
+                return cat;
+            });
+            saveCategories();
+            renderCategories();
         }
 
         // ฟังก์ชันปรับย้ายตำแหน่งหมวดหมู่หลัก
@@ -1377,7 +1473,7 @@
             const name = prompt('กรอกชื่อหมวดหมู่หลักใหม่:');
             if (name && name.trim()) {
                 const slug = name.trim().toLowerCase().replace(/\s+/g, '-');
-                const newCat = { id: slug + '-' + Date.now().toString().slice(-4), name: name.trim(), description: '', folderId: '', subcategories: [] };
+                const newCat = { id: slug + '-' + Date.now().toString().slice(-4), name: name.trim(), description: '', folderId: '', coverUrl: '', subcategories: [] };
                 categories.push(newCat);
                 saveCategories();
                 renderCategories();
@@ -1391,7 +1487,7 @@
             const name = prompt(`เพิ่มหมวดหมู่ย่อยใน "${cat.name}":`);
             if (name && name.trim()) {
                 const slug = name.trim().toLowerCase().replace(/\s+/g, '-');
-                const newSub = { id: slug + '-' + Date.now().toString().slice(-4), name: name.trim(), description: '', folderId: '' };
+                const newSub = { id: slug + '-' + Date.now().toString().slice(-4), name: name.trim(), description: '', folderId: '', coverUrl: '' };
                 categories = categories.map(c => c.id === catId ? { ...c, subcategories: [...(c.subcategories || []), newSub] } : c);
                 saveCategories();
                 renderCategories();
