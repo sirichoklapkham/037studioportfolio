@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title id="metaTitle">037Studio</title>
     
-    <!-- Open Graph & Social Preview Meta Tags (High Resolution Image Spec) -->
+    <!-- Open Graph & Social Preview Meta Tags -->
     <meta id="ogTitle" property="og:title" content="037Studio">
     <meta id="ogDesc" property="og:description" content="สตูดิโอถ่ายภาพ บรรยากาศเป็นกันเอง พร้อมสร้างสรรค์ผลงานคุณภาพด้วยอุปกรณ์มาตรฐานระดับมืออาชีพ">
     <meta id="ogImage" property="og:image" content="https://drive.google.com/thumbnail?id=13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL&sz=w1200">
@@ -20,7 +20,7 @@
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts & Preconnect Domains for Speed -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://lh3.googleusercontent.com">
@@ -40,14 +40,24 @@
         input[type=range] {
             touch-action: manipulation;
         }
+        
+        /* Shimmer Glow Animation for CTA Button */
+        @keyframes shimmer {
+            0% { transform: translateX(-150%); }
+            100% { transform: translateX(150%); }
+        }
+        .animate-shimmer {
+            animation: shimmer 2.5s infinite;
+        }
+
         @keyframes subtlePulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
-            50% { transform: scale(1.02); box-shadow: 0 0 25px rgba(245, 158, 11, 0.4); }
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(245, 158, 11, 0.25); }
+            50% { transform: scale(1.015); box-shadow: 0 0 30px rgba(245, 158, 11, 0.45); }
         }
-        .animate-cta {
-            animation: subtlePulse 2.5s infinite ease-in-out;
+        .animate-cta-pulse {
+            animation: subtlePulse 2s infinite ease-in-out;
         }
-        /* Style for smooth drag scrolling on desktop */
+
         .scroll-container {
             cursor: grab;
             user-select: none;
@@ -65,91 +75,112 @@
         <span id="toastMessage" class="text-xs font-medium truncate">คัดลอกลิงก์เรียบร้อยแล้ว</span>
     </div>
 
+    <!-- Floating ABOUT US Badge (Bottom-Left) -->
+    <button onclick="openAboutSheet()" class="fixed bottom-5 left-4 z-40 bg-neutral-900/90 hover:bg-neutral-800 text-amber-300 border border-amber-500/40 backdrop-blur-md px-3.5 py-2 rounded-full shadow-2xl flex items-center gap-2 active:scale-95 transition-all duration-200">
+        <div class="w-6 h-6 rounded-full overflow-hidden border border-amber-500/50 shrink-0">
+            <img id="floatingLogoImg" src="https://drive.google.com/thumbnail?id=13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL&sz=w800" alt="Logo" class="w-full h-full object-cover">
+        </div>
+        <span class="text-xs font-bold tracking-wide">เกี่ยวกับเรา</span>
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    </button>
+
+    <!-- Slide-Up Sheet for ABOUT US -->
+    <div id="aboutSheetBackdrop" onclick="closeAboutSheet()" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    <div id="aboutSheet" class="fixed bottom-0 left-0 right-0 z-50 bg-neutral-900 border-t border-neutral-800 rounded-t-3xl p-5 shadow-2xl transform translate-y-full transition-transform duration-300 max-h-[85vh] overflow-y-auto max-w-3xl mx-auto">
+        <div class="w-12 h-1.5 bg-neutral-700 rounded-full mx-auto mb-4 cursor-pointer" onclick="closeAboutSheet()"></div>
+        <div class="flex justify-between items-center pb-3 border-b border-neutral-800">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-neutral-950 border border-amber-500/30 overflow-hidden shrink-0 shadow-inner">
+                    <img id="aboutSectionLogo" src="https://drive.google.com/thumbnail?id=13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL&sz=w800" alt="037Studio Logo" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 text-amber-300 rounded-full text-[9px] font-semibold tracking-wider uppercase">ABOUT US</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    </div>
+                    <h2 id="displayShopName" class="text-base sm:text-xl font-bold tracking-wide text-white">037Studio</h2>
+                </div>
+            </div>
+            <button onclick="closeAboutSheet()" class="text-neutral-400 hover:text-white p-2 text-sm">✕ ปิด</button>
+        </div>
+
+        <div class="pt-4 space-y-4">
+            <div class="flex flex-col md:flex-row items-center gap-4">
+                <div class="w-full md:w-5/12 aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-950 border border-neutral-800 relative group shrink-0 shadow-lg">
+                    <img id="displayShopImg" src="https://drive.google.com/thumbnail?id=13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL&sz=w1200" alt="บรรยากาศร้าน 037Studio" class="w-full h-full object-cover">
+                    <div class="absolute top-3 left-3 bg-neutral-950/80 backdrop-blur-md border border-neutral-800 px-3 py-1 rounded-full flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-[10px] font-medium text-neutral-300">Open Studio</span>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-7/12 space-y-2">
+                    <p id="displayOwnerName" class="text-xs sm:text-sm text-amber-300 font-semibold">บริหารงานโดย คุณเอก & น้องตาร์</p>
+                    <p id="displayAboutBio" class="text-xs sm:text-sm text-neutral-300 leading-relaxed font-light">
+                        ยินดีต้อนรับสู่สตูดิโอถ่ายภาพ บรรยากาศเป็นกันเอง พร้อมสร้างสรรค์ผลงานคุณภาพด้วยอุปกรณ์มาตรฐานระดับมืออาชีพ
+                    </p>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-neutral-800/80">
+                <span class="text-[11px] uppercase tracking-wider text-amber-300 font-bold block mb-2.5">🛠️ บริการของเรา (Our Services):</span>
+                <div id="servicesContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Navbar & Header -->
-    <header class="sticky top-0 z-40 bg-neutral-950/90 backdrop-blur-md border-b border-neutral-800/80">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2.5 cursor-pointer" onclick="resetToHome()">
-                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-neutral-900 border border-amber-500/30 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+    <header class="sticky top-0 z-30 bg-neutral-950/90 backdrop-blur-md border-b border-neutral-800/80">
+        <div class="max-w-7xl mx-auto px-2.5 py-1.5 sm:px-3 sm:py-2 flex justify-between items-center gap-1.5">
+            <!-- Shop Logo & Title -->
+            <div class="flex items-center space-x-1.5 cursor-pointer shrink-0" onclick="resetToHome()">
+                <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-neutral-900 border border-amber-500/30 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                     <img id="headerLogoImg" src="https://drive.google.com/thumbnail?id=13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL&sz=w800" alt="037Studio Logo" class="w-full h-full object-cover" decoding="async">
                 </div>
                 <div>
-                    <h1 id="headerShopTitle" class="text-base sm:text-lg font-bold tracking-widest uppercase text-white leading-none">037Studio</h1>
+                    <h1 id="headerShopTitle" class="text-xs sm:text-lg font-bold tracking-widest uppercase text-white leading-none">037Studio</h1>
                 </div>
             </div>
             
-            <!-- Contact / Booking CTA Button for Customers with @LINE Redirect -->
-            <button id="contactBtn" onclick="openLineApp()" class="flex items-center gap-1.5 text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-full transition-all duration-200 active:scale-95 shadow-md shadow-emerald-500/20">
-                <span class="text-sm">💬</span>
-                <span id="contactBtnText" class="text-[11px] sm:text-xs">LINE / จองคิว</span>
-            </button>
+            <!-- Top Right Booking Buttons -->
+            <div class="flex items-center gap-1 shrink-0">
+                <button onclick="openBookingWebsite()" class="flex items-center justify-center gap-1 text-[10px] sm:text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black px-2 py-1 sm:px-3 sm:py-1.5 rounded-full transition-all duration-200 active:scale-95 shadow-md shadow-amber-500/10 shrink-0">
+                    <span class="text-[10px] sm:text-xs">📅</span>
+                    <span class="whitespace-nowrap">จองคิวออนไลน์</span>
+                </button>
+                <button onclick="openLineApp()" class="flex items-center justify-center gap-1 text-[10px] sm:text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-black px-2 py-1 sm:px-3 sm:py-1.5 rounded-full transition-all duration-200 active:scale-95 shadow-md shadow-emerald-500/10 shrink-0">
+                    <img src="https://drive.google.com/thumbnail?id=1-PCueW3wEo3k8n_OGYAVzuh2q05nqUb3&sz=w100" alt="LINE Logo" class="w-3 h-3 sm:w-3.5 sm:h-3.5 object-contain rounded-full shrink-0">
+                    <span class="whitespace-nowrap">สอบถาม/จองคิว</span>
+                </button>
+            </div>
         </div>
 
-        <!-- Category & Controls Bar -->
+        <!-- Category Bar -->
         <div class="max-w-7xl mx-auto px-4 pb-2 flex items-center justify-between gap-2">
-            
-            <!-- Category Navigation Container with Mobile Gradient Fade Indicator & Desktop Scroll Buttons -->
-            <div class="relative flex items-center flex-1 min-w-0 pr-1">
-                <button onclick="scrollCategory('categoryContainer', -200)" class="hidden sm:flex shrink-0 z-10 p-1.5 mr-1 bg-neutral-900/90 hover:bg-neutral-800 text-neutral-300 rounded-full border border-neutral-800 text-xs active:scale-95 transition" title="เลื่อนซ้าย">
-                    ◄
-                </button>
+            <div class="relative flex items-center flex-1 min-w-0">
+                <button onclick="scrollCategory('categoryContainer', -200)" class="hidden sm:flex shrink-0 z-10 p-1.5 mr-1 bg-neutral-900/90 hover:bg-neutral-800 text-neutral-300 rounded-full border border-neutral-800 text-xs active:scale-95 transition" title="เลื่อนซ้าย">◄</button>
 
-                <div id="categoryContainer" class="scroll-container flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth">
+                <div id="categoryContainer" class="scroll-container flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth w-full">
                     <!-- Main Categories injected dynamically -->
                 </div>
 
-                <!-- Gradient Overlay Indicator for Mobile Horizontal Scroll -->
                 <div id="categoryFadeHint" class="sm:hidden pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-neutral-950 via-neutral-950/80 to-transparent flex items-center justify-end pr-0.5 transition-opacity duration-300 z-10">
                     <span class="text-amber-400 font-bold text-xs animate-pulse">❯</span>
                 </div>
 
-                <button onclick="scrollCategory('categoryContainer', 200)" class="hidden sm:flex shrink-0 z-10 p-1.5 ml-1 bg-neutral-900/90 hover:bg-neutral-800 text-neutral-300 rounded-full border border-neutral-800 text-xs active:scale-95 transition" title="เลื่อนขวา">
-                    ►
-                </button>
-            </div>
-            
-            <!-- Floating Controls Menu Toggle (Compact Grid Slider) -->
-            <div class="flex items-center gap-1 shrink-0">
-                <button onclick="toggleGridControlModal()" title="ปรับขนาดการแสดงผลภาพ" class="p-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-full text-xs text-neutral-300 transition active:scale-95 flex items-center gap-1">
-                    <span>⚙️</span>
-                    <span id="gridSliderVal" class="text-[10px] font-semibold text-amber-400">2/แถว</span>
-                </button>
-                <button onclick="copyCurrentCategoryLink()" title="คัดลอกลิงก์หมวดหมู่นี้ส่งให้ลูกค้า" class="p-1.5 bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-neutral-300 border border-neutral-800 rounded-full text-xs transition">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
-                    </svg>
-                </button>
+                <button onclick="scrollCategory('categoryContainer', 200)" class="hidden sm:flex shrink-0 z-10 p-1.5 ml-1 bg-neutral-900/90 hover:bg-neutral-800 text-neutral-300 rounded-full border border-neutral-800 text-xs active:scale-95 transition" title="เลื่อนขวา">►</button>
             </div>
         </div>
 
-        <!-- Grid Size Control Quick Popup Dropdown -->
-        <div id="gridControlModal" class="hidden max-w-7xl mx-auto px-4 pb-2.5 pt-1 border-t border-neutral-900/80 bg-neutral-950/95">
-            <div class="flex items-center gap-3 bg-neutral-900/90 border border-neutral-800 px-3 py-1.5 rounded-2xl text-xs text-neutral-400 justify-between max-w-xs ml-auto">
-                <span class="text-[11px] font-medium shrink-0 text-white">ขนาดการแสดงผลรูป:</span>
-                <input id="gridSlider" type="range" min="1" max="4" value="2" oninput="updateGridCols(this.value)" class="w-full accent-amber-400 cursor-pointer h-1.5 bg-neutral-800 rounded-lg">
-            </div>
-        </div>
-
-        <!-- Subcategory Navigation Bar -->
         <div id="subcategoryBar" class="hidden max-w-7xl mx-auto px-4 pb-2 pt-1 border-t border-neutral-900">
             <div class="flex items-center gap-2 relative">
                 <span class="text-[10px] text-neutral-500 uppercase tracking-wider shrink-0 font-medium">ย่อย:</span>
-                
-                <button onclick="scrollCategory('subcategoryContainer', -150)" class="hidden sm:flex shrink-0 z-10 p-1 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 rounded-full border border-neutral-800 text-[10px] active:scale-95 transition">
-                    ◄
-                </button>
-
-                <div id="subcategoryContainer" class="scroll-container flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth">
-                    <!-- Subcategories injected dynamically -->
-                </div>
-
-                <!-- Gradient Overlay Indicator for Subcategories Mobile Scroll -->
+                <button onclick="scrollCategory('subcategoryContainer', -150)" class="hidden sm:flex shrink-0 z-10 p-1 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 rounded-full border border-neutral-800 text-[10px] active:scale-95 transition">◄</button>
+                <div id="subcategoryContainer" class="scroll-container flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth"></div>
                 <div id="subcategoryFadeHint" class="sm:hidden pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-neutral-950 via-neutral-950/80 to-transparent flex items-center justify-end pr-0.5 transition-opacity duration-300 z-10">
                     <span class="text-amber-400 font-bold text-[10px] animate-pulse">❯</span>
                 </div>
-
-                <button onclick="scrollCategory('subcategoryContainer', 150)" class="hidden sm:flex shrink-0 z-10 p-1 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 rounded-full border border-neutral-800 text-[10px] active:scale-95 transition">
-                    ►
-                </button>
+                <button onclick="scrollCategory('subcategoryContainer', 150)" class="hidden sm:flex shrink-0 z-10 p-1 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 rounded-full border border-neutral-800 text-[10px] active:scale-95 transition">►</button>
             </div>
         </div>
     </header>
@@ -162,16 +193,16 @@
                     <span class="p-1.5 bg-neutral-800 rounded-lg text-sm">⚙️</span>
                     <div>
                         <h2 class="text-sm sm:text-base font-bold text-white">ระบบหลังบ้าน (Admin)</h2>
-                        <p class="text-[10px] sm:text-xs text-neutral-400">ตั้งค่าส่วนแนะนำตัว, LINE ID, เพิ่ม/ลด บริการของร้าน, API Key และ Google Sheets</p>
+                        <p class="text-[10px] sm:text-xs text-neutral-400">ตั้งค่าส่วนแนะนำตัว, ลิงก์ระบบจองคิว, จัดการแพ็คเกจราคา และเชื่อมต่อ Google Sheets</p>
                     </div>
                 </div>
                 <button onclick="toggleAdmin()" class="text-neutral-500 hover:text-white text-xs sm:text-sm p-1">✕ ปิด</button>
             </div>
 
-            <!-- About Us & Dynamic Services Admin Settings -->
+            <!-- Shop Settings -->
             <div class="space-y-4 pt-1">
                 <h3 class="text-xs sm:text-sm font-semibold text-amber-400 flex items-center gap-1.5">
-                    <span>👋</span> ตั้งค่าข้อมูลแนะนำตัว, LINE ID & รายละเอียดบริการ
+                    <span>👋</span> ตั้งค่าข้อมูลร้าน, ลิงก์จองคิว & LINE ID
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
@@ -179,94 +210,97 @@
                         <input type="text" id="adminShopName" placeholder="037Studio" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs text-white">
                     </div>
                     <div>
-                        <label class="block text-[11px] text-neutral-400 mb-1">LINE ID ของทางร้าน (มี @):</label>
+                        <label class="block text-[11px] text-neutral-400 mb-1">LINE ID ร้าน (มี @):</label>
                         <input type="text" id="adminLineId" placeholder="@037studio" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs font-semibold text-emerald-400">
                     </div>
+                    <div>
+                        <label class="block text-[11px] text-neutral-400 mb-1">ลิงก์เว็บระบบจองคิว (Booking URL):</label>
+                        <input type="text" id="adminBookingUrl" placeholder="https://zerva.app/037studio" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs font-semibold text-amber-400">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="block text-[11px] text-neutral-400 mb-1">เจ้าของร้าน & ทีมงาน:</label>
                         <input type="text" id="adminOwnerName" placeholder="คุณเอก & น้องตาร์" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs text-white">
                     </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[11px] text-neutral-400 mb-1">รูปภาพโลโก้ร้าน (Google Drive Link):</label>
-                        <input type="text" id="adminShopLogoUrl" placeholder="วางลิงก์โลโก้ https://drive.google.com/..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs text-white">
+                        <input type="text" id="adminShopLogoUrl" placeholder="https://drive.google.com/..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs text-white">
                     </div>
                     <div>
-                        <label class="block text-[11px] text-neutral-400 mb-1">ภาพบรรยากาศ/แนะนำตัวร้าน (Google Drive Link):</label>
-                        <input type="text" id="adminShopImgUrl" placeholder="วางลิงก์ภาพแนะนำตัว https://drive.google.com/..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs text-white">
+                        <label class="block text-[11px] text-neutral-400 mb-1">ภาพบรรยากาศร้าน (Google Drive Link):</label>
+                        <input type="text" id="adminShopImgUrl" placeholder="https://drive.google.com/..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs text-white">
                     </div>
                 </div>
                 <div>
                     <label class="block text-[11px] text-neutral-400 mb-1">ข้อความแนะนำตัวเพิ่มเติม:</label>
                     <textarea id="adminAboutBio" rows="2" placeholder="ข้อความต้อนรับสั้นๆ..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2 text-xs text-white"></textarea>
                 </div>
+            </div>
 
-                <!-- Manage Dynamic Services (Add / Delete) -->
-                <div class="pt-3 border-t border-neutral-800/80 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-[11px] font-semibold text-amber-300 block">🛠️ จัดการรายการบริการของทางร้าน:</span>
-                        <button onclick="addAdminService()" class="bg-amber-500 hover:bg-amber-400 text-black px-3 py-1 rounded-lg text-[11px] font-bold transition active:scale-95 shadow">
-                            + เพิ่มบริการใหม่
-                        </button>
+            <!-- Manage Packages & Pricing -->
+            <div class="pt-4 border-t border-neutral-800 space-y-3">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xs sm:text-sm font-semibold text-amber-400">📦 จัดการศูนย์รวมแพ็คเกจราคา & ลิงก์ตัวอย่าง</h3>
+                        <p class="text-[10px] text-neutral-400">แก้ไขรายละเอียดราคา และเลือกหมวดหมู่รูปภาพที่จะให้ลิงก์ไปกดดูตัวอย่าง</p>
                     </div>
-
-                    <div id="adminServicesList" class="space-y-2.5">
-                        <!-- Dynamic Service Admin Cards injected via JS -->
-                    </div>
-                </div>
-
-                <div class="pt-2">
-                    <button onclick="saveAboutInfo()" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-black px-6 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 shadow-lg flex items-center justify-center gap-1.5">
-                        <span>💾</span> บันทึกข้อมูลตั้งค่า (Auto Save To Google ชีท)
+                    <button onclick="addNewAdminPackage()" class="bg-amber-500 hover:bg-amber-400 text-black px-3 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 shadow">
+                        + เพิ่มแพ็คเกจใหม่
                     </button>
                 </div>
+
+                <div id="adminPackagesList" class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                    <!-- Admin package editors injected via JS -->
+                </div>
+            </div>
+
+            <!-- Dynamic Services Admin Settings -->
+            <div class="pt-3 border-t border-neutral-800 space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-[11px] font-semibold text-amber-300 block">🛠️ จัดการรายการบริการของทางร้าน:</span>
+                    <button onclick="addAdminService()" class="bg-amber-500 hover:bg-amber-400 text-black px-3 py-1 rounded-lg text-[11px] font-bold transition active:scale-95 shadow">
+                        + เพิ่มบริการใหม่
+                    </button>
+                </div>
+                <div id="adminServicesList" class="space-y-2.5"></div>
+            </div>
+
+            <div class="pt-2">
+                <button onclick="saveAboutInfo()" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-black px-6 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 shadow-lg flex items-center justify-center gap-1.5">
+                    <span>💾</span> บันทึกข้อมูลตั้งค่าทั้งหมด (Auto Sync Google ชีท)
+                </button>
             </div>
 
             <!-- API Key Input -->
             <div class="space-y-2 pt-3 border-t border-neutral-800/60">
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Google Drive API Key:</label>
                 <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="password" id="apiKeyInput" placeholder="วาง Google Drive API Key ที่นี่..." 
-                        class="flex-1 bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:outline-none focus:border-neutral-500 text-white transition">
-                    <button onclick="saveApiKey()" class="bg-white text-black px-4 py-2 rounded-xl text-xs font-bold hover:bg-neutral-200 transition active:scale-95">
-                        บันทึก API Key
-                    </button>
+                    <input type="password" id="apiKeyInput" placeholder="วาง Google Drive API Key ที่นี่..." class="flex-1 bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:outline-none text-white transition">
+                    <button onclick="saveApiKey()" class="bg-white text-black px-4 py-2 rounded-xl text-xs font-bold hover:bg-neutral-200 transition active:scale-95">บันทึก API Key</button>
                 </div>
             </div>
 
-            <!-- Google Sheets Integration & Backup -->
+            <!-- Google Sheets Sync -->
             <div class="space-y-2 pt-3 border-t border-neutral-800/60">
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-emerald-400">📊 Google Sheets Backup Sync URL:</label>
                 <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="text" id="sheetUrlInput" placeholder="วาง Google Apps Script Web App URL..." 
-                        class="flex-1 bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:outline-none focus:border-neutral-500 text-white transition">
-                    <button onclick="saveSheetUrl()" class="bg-emerald-500 hover:bg-emerald-400 text-black px-4 py-2 rounded-xl text-xs font-bold transition active:scale-95 shrink-0">
-                        บันทึก Web App URL
-                    </button>
+                    <input type="text" id="sheetUrlInput" placeholder="วาง Google Apps Script Web App URL..." class="flex-1 bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:outline-none text-white transition">
+                    <button onclick="saveSheetUrl()" class="bg-emerald-500 hover:bg-emerald-400 text-black px-4 py-2 rounded-xl text-xs font-bold transition active:scale-95 shrink-0">บันทึก Web App URL</button>
                 </div>
                 <div class="flex flex-wrap gap-2 pt-1">
-                    <button onclick="backupToSheet()" class="bg-neutral-800 hover:bg-neutral-700 text-emerald-400 border border-emerald-800/50 px-3 py-1.5 rounded-lg text-xs font-medium transition active:scale-95">
-                        📤 สำรองข้อมูลลง Google ชีททันที
-                    </button>
-                    <button onclick="restoreFromSheet()" class="bg-neutral-800 hover:bg-neutral-700 text-sky-400 border border-sky-800/50 px-3 py-1.5 rounded-lg text-xs font-medium transition active:scale-95">
-                        📥 ดึงข้อมูลคืนจาก Google ชีท
-                    </button>
+                    <button onclick="backupToSheet()" class="bg-neutral-800 hover:bg-neutral-700 text-emerald-400 border border-emerald-800/50 px-3 py-1.5 rounded-lg text-xs font-medium transition active:scale-95">📤 สำรองข้อมูลลง Google ชีททันที</button>
+                    <button onclick="restoreFromSheet()" class="bg-neutral-800 hover:bg-neutral-700 text-sky-400 border border-sky-800/50 px-3 py-1.5 rounded-lg text-xs font-medium transition active:scale-95">📥 ดึงข้อมูลคืนจาก Google ชีท</button>
                 </div>
             </div>
 
             <!-- Category Management -->
             <div class="space-y-3 pt-3 border-t border-neutral-800/60">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-xs sm:text-sm font-semibold text-neutral-300">จัดการหมวดหมู่และรายละเอียดแพ็คเกจ</h3>
-                    <button onclick="addNewCategory()" class="bg-white text-black hover:bg-neutral-200 text-[11px] sm:text-xs px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1 active:scale-95">
-                        <span>+</span> เพิ่มหมวดหมู่หลัก
-                    </button>
+                    <h3 class="text-xs sm:text-sm font-semibold text-neutral-300">จัดการหมวดหมู่รูปภาพแสดงผลงาน</h3>
+                    <button onclick="addNewCategory()" class="bg-white text-black hover:bg-neutral-200 text-[11px] sm:text-xs px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1 active:scale-95">+ เพิ่มหมวดหมู่หลัก</button>
                 </div>
-
-                <div id="adminCategoryList" class="grid gap-3 max-h-[400px] overflow-y-auto pr-1">
-                    <!-- Admin categories injected via JS -->
-                </div>
+                <div id="adminCategoryList" class="grid gap-3 max-h-[400px] overflow-y-auto pr-1"></div>
             </div>
         </div>
     </section>
@@ -274,97 +308,88 @@
     <!-- Main Content Gallery -->
     <main class="flex-1 max-w-7xl mx-auto w-full px-3 py-3 sm:p-6 space-y-4">
 
-        <!-- COLLAPSIBLE ABOUT US SECTION WITH CUSTOM LOGO & DYNAMIC SERVICES -->
-        <section id="aboutSection" class="bg-neutral-900/80 border border-neutral-800/90 rounded-3xl p-3.5 sm:p-5 shadow-2xl relative overflow-hidden backdrop-blur-sm transition-all duration-300">
-            <div class="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            
-            <!-- Header Bar with Logo Image & Animated Trigger Button -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div class="flex items-center gap-3 cursor-pointer" onclick="toggleAboutCollapse()">
-                    <!-- Custom Logo Img -->
-                    <div class="w-9 h-9 rounded-2xl bg-neutral-950 border border-amber-500/30 overflow-hidden flex items-center justify-center shrink-0 shadow-inner">
-                        <img id="aboutSectionLogo" src="https://drive.google.com/thumbnail?id=13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL&sz=w800" alt="037Studio Logo" class="w-full h-full object-cover" decoding="async">
+        <!-- HIGH-CONVERTING GLASSMORPHIC CTA BUTTON & COLLAPSIBLE PACKAGE SECTION -->
+        <section id="packageCatalogSection" class="relative overflow-hidden transition-all duration-300">
+            <!-- Glassmorphic Promo Banner (CTA Trigger) -->
+            <button 
+                onclick="togglePackageCatalogCollapse()" 
+                class="animate-cta-pulse w-full bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border border-amber-500/50 backdrop-blur-xl p-3.5 sm:p-4 rounded-3xl shadow-2xl relative overflow-hidden group transition-all duration-300 active:scale-[0.99] text-left flex items-center justify-between"
+            >
+                <!-- Shimmer Light Effect -->
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -skew-x-12 animate-shimmer pointer-events-none"></div>
+
+                <div class="flex items-center gap-3 relative z-10">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-lg shrink-0 shadow-inner">
+                        🔥
                     </div>
                     <div>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 text-amber-300 rounded-full text-[9px] font-semibold tracking-wider uppercase">ABOUT US</span>
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="px-2 py-0.5 bg-amber-400 text-black font-extrabold rounded-md text-[9px] uppercase tracking-wider">SPECIAL PROMO</span>
+                            <span class="text-[10px] text-amber-300 font-semibold">เริ่มต้น 199.-</span>
                         </div>
-                        <h2 id="displayShopName" class="text-base sm:text-xl font-bold tracking-wide text-white">037Studio</h2>
+                        <h3 class="text-xs sm:text-sm font-extrabold text-white tracking-wide mt-0.5 group-hover:text-amber-300 transition">
+                            ดูแพ็คเกจราคาถ่ายภาพ & โปรโมชั่นพิเศษทั้งหมด
+                        </h3>
                     </div>
                 </div>
 
-                <!-- Animated Interactive CTA Button -->
-                <button id="aboutToggleBtn" onclick="toggleAboutCollapse()" class="animate-cta w-full sm:w-auto px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold text-xs rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 shrink-0">
-                    <span id="aboutToggleIcon">✨</span>
-                    <span id="aboutToggleText">ทำความรู้จักเราเพิ่มเติม</span>
-                    <span id="aboutToggleArrow" class="text-xs transition-transform duration-300">▼</span>
-                </button>
-            </div>
+                <div class="flex items-center gap-1 shrink-0 relative z-10 bg-amber-500 text-black px-3 py-1.5 rounded-2xl font-bold text-xs shadow-md">
+                    <span id="packageCatalogBtnText">แตะเพื่อดู</span>
+                    <span id="packageCatalogBtnArrow" class="transition-transform duration-300">▼</span>
+                </div>
+            </button>
 
-            <!-- Collapsible Body Content -->
-            <div id="aboutCollapsibleBody" class="max-h-0 opacity-0 overflow-hidden transition-all duration-500 ease-in-out">
-                <div class="pt-4 mt-3 border-t border-neutral-800/80 flex flex-col md:flex-row items-center gap-5">
-                    <!-- ฝั่งซ้าย: รูปบรรยากาศร้าน -->
-                    <div class="w-full md:w-5/12 aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-950 border border-neutral-800 relative group shrink-0 shadow-lg">
-                        <img id="displayShopImg" src="https://drive.google.com/thumbnail?id=13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL&sz=w1200" alt="บรรยากาศร้าน 037Studio" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" decoding="async">
-                        <div class="absolute top-3 left-3 bg-neutral-950/80 backdrop-blur-md border border-neutral-800 px-3 py-1 rounded-full flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span class="text-[10px] font-medium text-neutral-300">Open Studio</span>
-                        </div>
-                    </div>
-
-                    <!-- ฝั่งขวา: ประวัติ & ทีมงาน -->
-                    <div class="w-full md:w-7/12 space-y-2.5">
-                        <p id="displayOwnerName" class="text-xs sm:text-sm text-amber-300 font-semibold">บริหารงานโดย คุณเอก (เจ้าของร้าน) & น้องตาร์ (ลูกเจ้าของร้าน)</p>
-                        <p id="displayAboutBio" class="text-xs sm:text-sm text-neutral-300 leading-relaxed font-light">
-                            ยินดีต้อนรับสู่สตูดิโอถ่ายภาพ บรรยากาศเป็นกันเอง พร้อมสร้างสรรค์ผลงานคุณภาพด้วยอุปกรณ์มาตรฐานระดับมืออาชีพ
-                        </p>
-                    </div>
+            <!-- Collapsible Package Content Grid (Hidden by Default) -->
+            <div id="packageCatalogContent" class="hidden mt-3 bg-neutral-900/90 border border-amber-500/30 rounded-3xl p-3.5 sm:p-5 shadow-2xl space-y-4 backdrop-blur-md">
+                <!-- Sub-Tabs for Package Categories -->
+                <div id="packageSubTabs" class="scroll-container flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                    <button onclick="switchPackageTab('all')" id="pkgTab-all" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 bg-amber-400 text-black">
+                        ทั้งหมด
+                    </button>
+                    <button onclick="switchPackageTab('selfie')" id="pkgTab-selfie" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 bg-neutral-900 text-neutral-400 border border-neutral-800">
+                        📸 เซลฟี่สตู
+                    </button>
+                    <button onclick="switchPackageTab('profile')" id="pkgTab-profile" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 bg-neutral-900 text-neutral-400 border border-neutral-800">
+                        👤 ถ่ายโปรไฟล์
+                    </button>
+                    <button onclick="switchPackageTab('rental')" id="pkgTab-rental" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 bg-neutral-900 text-neutral-400 border border-neutral-800">
+                        🏠 เช่าสตูดิโอ
+                    </button>
                 </div>
 
-                <!-- Dynamic Services Cards Container -->
-                <div class="pt-4 mt-4 border-t border-neutral-800/80">
-                    <span class="text-[11px] uppercase tracking-wider text-amber-300 font-bold block mb-2.5">🛠️ บริการของเรา (Our Services):</span>
-                    <div id="servicesContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <!-- Services injected via JS -->
-                    </div>
+                <!-- Package Cards Grid -->
+                <div id="packageCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <!-- Cards injected via JS -->
                 </div>
             </div>
         </section>
 
-        <!-- Redesigned High-Impact Package & Price Display Card -->
-        <div id="packageCard" class="hidden bg-neutral-900/90 border border-amber-500/30 rounded-2xl p-3.5 sm:p-4 backdrop-blur-sm relative overflow-hidden shadow-xl transition-all duration-300">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-800/80 pb-2.5">
-                <div class="flex items-center gap-2">
-                    <span class="p-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-lg text-xs">🏷️</span>
-                    <div>
-                        <h3 id="packageTitle" class="text-xs sm:text-sm font-bold text-amber-300 tracking-wide">แพ็คเกจราคา & รายละเอียด</h3>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-2 shrink-0">
-                    <button onclick="copyCurrentCategoryLink()" class="text-[11px] text-neutral-300 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700/80 px-2.5 py-1 rounded-lg font-medium transition active:scale-95 flex items-center gap-1">
-                        <span>🔗</span> แชร์หมวดนี้
-                    </button>
-                    <button id="packageToggleBtn" onclick="togglePackageCollapse()" class="text-[11px] text-amber-400 hover:text-amber-300 font-medium px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 transition">
-                        ▼ อ่านเพิ่มเติม
-                    </button>
-                </div>
-            </div>
-
-            <div id="packageDescription" class="text-xs text-neutral-300 whitespace-pre-line leading-relaxed font-light overflow-hidden transition-all duration-300 max-h-20 pt-2">
-                <!-- Dynamic details injected here -->
-            </div>
-        </div>
-
-        <!-- Active Category Header Title -->
+        <!-- Active Category Header Title & Controls -->
         <div id="activeCategoryHeader" class="flex justify-between items-center border-b border-neutral-900 pb-2 scroll-mt-24">
             <div>
                 <span id="activeCategoryBreadcrumb" class="text-[9px] sm:text-[10px] uppercase tracking-widest text-neutral-500">PORTFOLIO</span>
                 <h2 id="activeCategoryTitle" class="text-base sm:text-xl font-bold tracking-wide text-white">ผลงาน</h2>
             </div>
-            <span class="text-[10px] text-neutral-500">แตะรูปเพื่อดูภาพขยาย</span>
+            
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="toggleGridControlModal()" title="ปรับขนาดการแสดงผลภาพ" class="px-2.5 py-1 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-full text-xs text-neutral-300 transition active:scale-95 flex items-center gap-1 shadow-sm">
+                    <span>⚙️</span>
+                    <span id="gridSliderVal" class="text-[10px] font-semibold text-amber-400">2/แถว</span>
+                </button>
+                <button onclick="copyCurrentCategoryLink()" title="คัดลอกลิงก์หมวดหมู่นี้ส่งให้ลูกค้า" class="p-1.5 bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-neutral-300 border border-neutral-800 rounded-full text-xs transition shadow-sm">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Relocated Grid Control Slider Panel (Compact, Right-Aligned & Auto-Folding) -->
+        <div id="gridControlModal" class="hidden my-2 p-2.5 bg-neutral-900/95 border border-neutral-800 rounded-2xl shadow-xl transition-all duration-300 ml-auto w-fit max-w-[280px] sm:max-w-xs">
+            <div class="flex items-center gap-2.5">
+                <span class="text-[11px] font-medium text-amber-400 shrink-0 whitespace-nowrap">ขนาดรูป:</span>
+                <input id="gridSlider" type="range" min="1" max="4" value="2" oninput="updateGridCols(this.value)" onchange="autoCloseGridControlModal()" class="w-28 sm:w-36 accent-amber-400 cursor-pointer h-1.5 bg-neutral-800 rounded-lg">
+            </div>
         </div>
 
         <!-- Status Messages -->
@@ -379,8 +404,8 @@
         </div>
     </main>
 
-    <!-- Footer with Integrated Discrete Admin Login Button -->
-    <footer class="border-t border-neutral-900 py-6 text-center text-[11px] text-neutral-500 space-y-2">
+    <!-- Footer -->
+    <footer class="border-t border-neutral-900 py-6 text-center text-[11px] text-neutral-500 space-y-2 mb-12 sm:mb-0">
         <p>&copy; 037Studio. All rights reserved.</p>
         <button id="toggleAdminBtn" onclick="toggleAdmin()" class="text-[10px] text-neutral-600 hover:text-neutral-400 transition underline underline-offset-4">
             ⚙️ ระบบหลังบ้าน (สำหรับเจ้าของร้าน)
@@ -397,30 +422,101 @@
         </div>
 
         <div id="lightboxTouchArea" class="relative flex-1 w-full flex items-center justify-center overflow-hidden my-2">
-            <button onclick="prevLightboxImage()" class="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-neutral-900/70 border border-neutral-800 p-3 rounded-full text-lg z-10 transition active:scale-95">
-                ❮
-            </button>
-
+            <button onclick="prevLightboxImage()" class="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-neutral-900/70 border border-neutral-800 p-3 rounded-full text-lg z-10 transition active:scale-95">❮</button>
             <img id="lightboxImg" src="" alt="Full view" class="max-w-full max-h-[80vh] sm:max-h-[85vh] object-contain rounded-lg shadow-2xl transition-all duration-200" decoding="async">
-
-            <button onclick="nextLightboxImage()" class="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-neutral-900/70 border border-neutral-800 p-3 rounded-full text-lg z-10 transition active:scale-95">
-                ❯
-            </button>
+            <button onclick="nextLightboxImage()" class="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-neutral-900/70 border border-neutral-800 p-3 rounded-full text-lg z-10 transition active:scale-95">❯</button>
         </div>
 
         <div class="flex sm:hidden justify-between items-center px-4 pb-3 z-20">
-            <button onclick="prevLightboxImage()" class="flex-1 mr-2 py-2.5 bg-neutral-900/90 border border-neutral-800 text-white rounded-xl text-center text-sm active:bg-neutral-800 transition">
-                ❮ ก่อนหน้า
-            </button>
-            <button onclick="nextLightboxImage()" class="flex-1 ml-2 py-2.5 bg-neutral-900/90 border border-neutral-800 text-white rounded-xl text-center text-sm active:bg-neutral-800 transition">
-                ถัดไป ❯
-            </button>
+            <button onclick="prevLightboxImage()" class="flex-1 mr-2 py-2.5 bg-neutral-900/90 border border-neutral-800 text-white rounded-xl text-center text-sm active:bg-neutral-800 transition">❮ ก่อนหน้า</button>
+            <button onclick="nextLightboxImage()" class="flex-1 ml-2 py-2.5 bg-neutral-900/90 border border-neutral-800 text-white rounded-xl text-center text-sm active:bg-neutral-800 transition">ถัดไป ❯</button>
         </div>
     </div>
 
     <script>
         const DEFAULT_LOGO_URL = 'https://drive.google.com/thumbnail?id=13URW3wYnrYhy0aHzrwHG5Xx83pvcyBvL&sz=w1200';
+        const DEFAULT_LINE_LOGO_URL = 'https://drive.google.com/thumbnail?id=1-PCueW3wEo3k8n_OGYAVzuh2q05nqUb3&sz=w100';
         const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwAMS0xqSV-9t9com4LFQzcRZ7rHwNMp-GHkJyy-kU6YaYCEpTNR40io5fz__sGkZIm8g/exec';
+        const DEFAULT_BOOKING_URL = 'https://zerva.app/037studio';
+
+        // Initial Default Studio Packages
+        const DEFAULT_PACKAGES = [
+            {
+                id: 'pkg-selfie-half',
+                type: 'selfie',
+                categoryId: 'portfolio',
+                subcategoryId: '',
+                title: '📸 เซลฟี่สตูดิโอ (ครึ่งตัว)',
+                subtitle: 'กดถ่ายเองด้วยรีโมท เข้าถ่ายได้ 1-2 คน',
+                price1_time: '10 นาที',
+                price1_val: '199.-',
+                price1_gift: 'แถมปริ้นรูป 1 ใบ 🖼️',
+                price2_time: '20 นาที',
+                price2_val: '350.-',
+                price2_gift: 'แถมปริ้นรูป 2 ใบ 🖼️',
+                featuresText: 'เปลี่ยนฉากถ่ายภาพได้ทุกฉาก\nได้ใช้พร็อพทั้งหมดของร้าน\nกดถ่ายด้วยตัวเองไม่จำกัด\nปรับแต่งภาพผิวขาวใส\nได้ไฟล์ภาพทั้งหมดหลังถ่ายทันที 📁'
+            },
+            {
+                id: 'pkg-selfie-full',
+                type: 'selfie',
+                categoryId: 'portfolio',
+                subcategoryId: '',
+                title: '📷 เซลฟี่สตูดิโอ (เต็มตัว/ครึ่งตัว)',
+                subtitle: 'กดถ่ายเองด้วยรีโมท เข้าถ่ายได้ 1-2 คน',
+                price1_time: '10 นาที',
+                price1_val: '249.-',
+                price1_gift: 'แถมปริ้นรูป 1 ใบ 🖼️',
+                price2_time: '20 นาที',
+                price2_val: '400.-',
+                price2_gift: 'แถมปริ้นรูป 2 ใบ 🖼️',
+                featuresText: 'ถ่ายภาพเต็มตัวและครึ่งตัว\nเปลี่ยนฉากถ่ายภาพได้ทุกฉาก\nได้ใช้พร็อพทั้งหมดของร้าน\nกดถ่ายด้วยตัวเองไม่จำกัด\nได้ไฟล์ภาพทั้งหมดหลังถ่ายทันที 📁'
+            },
+            {
+                id: 'pkg-profile-ph',
+                type: 'profile',
+                categoryId: 'profile-studio',
+                subcategoryId: '',
+                title: '👤 ถ่ายโปรไฟล์ (พร้อมช่างภาพ)',
+                subtitle: 'ช่างภาพถ่ายให้ คิดท่าโพสให้ เปลี่ยนมุมกล้องได้เร็ว',
+                price1_time: '20 นาที (สูงสุด 4 คน)',
+                price1_val: 'เริ่มต้น 450.-',
+                price1_gift: 'แถมปริ้นรูปตามจำนวนคน 🖼️',
+                price2_time: '40 นาที (สูงสุด 6 คน)',
+                price2_val: 'เริ่มต้น 900.-',
+                price2_gift: 'แถมปริ้นรูปตามจำนวนคน 🖼️',
+                featuresText: 'เข้าถ่าย 1 คน (450.-) / 2 คน (550.-) / 3 คน (650.-) / 4 คน (750.-)\nเลือกฉากถ่ายภาพได้ทั้งหมด\nได้ใช้พร็อพทั้งหมดของร้าน\nช่างภาพจัดแสงและปรับแต่งผิวขาวใส\nได้ไฟล์ภาพทั้งหมดหลังถ่ายทันที (มัดจำ 50%)'
+            },
+            {
+                id: 'pkg-rental-space',
+                type: 'rental',
+                categoryId: 'profile-studio',
+                subcategoryId: '',
+                title: '🏠 เช่าสตูดิโอ (เฉพาะสถานที่)',
+                subtitle: 'ถ่าย Vlog, สัมมนา หรือกิจกรรมส่วนตัว (ปิดชั้น 2 เป็นส่วนตัว)',
+                price1_time: '1 ชั่วโมง',
+                price1_val: '500.-',
+                price1_gift: 'ใช้อุปกรณ์สตูดิโอครบครัน',
+                price2_time: '4 ชั่วโมง',
+                price2_val: '2,000.-',
+                price2_gift: 'เหมาวัน 8 ชม. เพียง 3,600.-',
+                featuresText: 'ไฟต่อเนื่อง Bazuka MAX 300x2 / 500x2\nแฟลชสตูดิโอ Godox SK400II 400W x3\nคอมพิวเตอร์ต่อกล้อง + ทีวี TCL 43 นิ้ว 4K QLED\nใช้ฉากได้ทุกฉาก (ขาว, ดำ, ชมพู, เทา, สายรุ้ง)'
+            },
+            {
+                id: 'pkg-rental-ph',
+                type: 'rental',
+                categoryId: 'profile-studio',
+                subcategoryId: '',
+                title: '📸 เช่าสตูดิโอ (พร้อมช่างภาพ)',
+                subtitle: 'อยากถ่ายรูปแบบไหน ส่งเรฟให้ช่างภาพดูก่อนได้เลย',
+                price1_time: '1 ชั่วโมง',
+                price1_val: '1,500.-',
+                price1_gift: 'แถมปริ้นรูป 2 ใบ 🖼️',
+                price2_time: '4 ชั่วโมง',
+                price2_val: '4,900.-',
+                price2_gift: 'เหมาวัน 8 ชม. เพียง 8,900.-',
+                featuresText: 'ช่างภาพดูแลจัดแสงตลอดระยะเวลา\nเลือกฉากถ่ายภาพได้ทั้งหมด\nปรับแต่งภาพผิวขาวใส\nได้ไฟล์ภาพทั้งหมดหลังถ่ายทันที 📁'
+            }
+        ];
 
         const DEFAULT_CATEGORIES = [
             { id: 'portfolio', name: '📸 เซลฟี่สตู (ครึ่งตัว)', description: '✨ เซลฟี่สตูดิโอ (ครึ่งตัว) 📸\nกดถ่ายเอง (รีโมทกดถ่าย) เข้าถ่ายได้ 1-2 คน\n⏰ เวลา : 10 นาที ราคา 199.- แถมปริ้นรูป 1 ใบ 🖼️', folderId: '', subcategories: [] },
@@ -446,6 +542,7 @@
         const DEFAULT_ABOUT = {
             shopName: '037Studio',
             lineId: '@037studio',
+            bookingUrl: DEFAULT_BOOKING_URL,
             ownerName: 'คุณเอก & น้องตาร์',
             shopLogoUrl: DEFAULT_LOGO_URL,
             shopImgUrl: DEFAULT_LOGO_URL,
@@ -475,6 +572,7 @@
         let urlSheetParam = urlParams.get('sheetUrl') || urlParams.get('scriptUrl');
 
         let categories = JSON.parse(localStorage.getItem('photo_portfolio_categories_v2')) || DEFAULT_CATEGORIES;
+        let studioPackages = JSON.parse(localStorage.getItem('photo_portfolio_packages')) || DEFAULT_PACKAGES;
         let aboutInfo = JSON.parse(localStorage.getItem('photo_portfolio_about')) || DEFAULT_ABOUT;
         let apiKey = localStorage.getItem('photo_portfolio_api_key') || '';
         
@@ -484,16 +582,23 @@
         let { activeCategoryId, activeSubcategoryId } = getInitialCategoryState();
         let loadedImages = [];
         let currentLightboxIndex = 0;
-        let isPackageExpanded = false;
-        let isAboutExpanded = false;
+        let isPackageCatalogExpanded = false;
+        let activePackageTab = 'all';
 
-        // In-memory cache for loaded images by folder
         const folderImageCache = new Map();
 
         let touchStartX = 0;
         let touchEndX = 0;
 
-        function openLineApp() {
+        function openBookingWebsite() {
+            let bookingUrl = (aboutInfo.bookingUrl || DEFAULT_BOOKING_URL).trim();
+            if (!bookingUrl.startsWith('http://') && !bookingUrl.startsWith('https://')) {
+                bookingUrl = 'https://' + bookingUrl;
+            }
+            window.open(bookingUrl, '_blank');
+        }
+
+        function openLineApp(pkgTitle = '') {
             let lineIdClean = (aboutInfo.lineId || '@037studio').trim();
             if (lineIdClean.startsWith('@')) {
                 lineIdClean = lineIdClean.substring(1);
@@ -501,44 +606,56 @@
             window.open(`https://line.me/R/ti/p/@${lineIdClean}`, '_blank');
         }
 
+        function openAboutSheet() {
+            const sheet = document.getElementById('aboutSheet');
+            const backdrop = document.getElementById('aboutSheetBackdrop');
+            backdrop.classList.remove('pointer-events-none', 'opacity-0');
+            backdrop.classList.add('opacity-100');
+            sheet.classList.remove('translate-y-full');
+        }
+
+        function closeAboutSheet() {
+            const sheet = document.getElementById('aboutSheet');
+            const backdrop = document.getElementById('aboutSheetBackdrop');
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
+            sheet.classList.add('translate-y-full');
+        }
+
         function toggleGridControlModal() {
-            const modal = document.getElementById('gridControlModal');
-            modal.classList.toggle('hidden');
+            document.getElementById('gridControlModal').classList.toggle('hidden');
+        }
+
+        function autoCloseGridControlModal() {
+            setTimeout(() => {
+                const modal = document.getElementById('gridControlModal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    modal.classList.add('hidden');
+                }
+            }, 300);
         }
 
         function formatImageUrl(input, size = 'w1200') {
             if (!input || !input.trim()) return DEFAULT_LOGO_URL;
             let str = input.trim();
-            
             if (str.startsWith('http') && !str.includes('drive.google.com') && !str.includes('lh3.googleusercontent.com')) {
                 return str;
             }
-
             let fileId = '';
-            if (str.includes('/file/d/')) {
-                fileId = str.split('/file/d/')[1].split('/')[0].split('?')[0];
-            } else if (str.includes('/folders/')) {
-                fileId = str.split('/folders/')[1].split('?')[0];
-            } else if (str.includes('id=')) {
-                fileId = str.split('id=')[1].split('&')[0];
-            } else if (str.includes('/d/')) {
-                fileId = str.split('/d/')[1].split('/')[0].split('?')[0];
-            } else {
-                fileId = str;
-            }
+            if (str.includes('/file/d/')) fileId = str.split('/file/d/')[1].split('/')[0].split('?')[0];
+            else if (str.includes('/folders/')) fileId = str.split('/folders/')[1].split('?')[0];
+            else if (str.includes('id=')) fileId = str.split('id=')[1].split('&')[0];
+            else if (str.includes('/d/')) fileId = str.split('/d/')[1].split('/')[0].split('?')[0];
+            else fileId = str;
 
             return fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=${size}` : str;
         }
 
         function extractFolderId(urlOrId) {
             let cleanId = urlOrId ? urlOrId.trim() : '';
-            if (cleanId.includes('/folders/')) {
-                cleanId = cleanId.split('/folders/')[1].split('?')[0];
-            } else if (cleanId.includes('/d/')) {
-                cleanId = cleanId.split('/d/')[1].split('/')[0].split('?')[0];
-            } else if (cleanId.includes('id=')) {
-                cleanId = cleanId.split('id=')[1].split('&')[0];
-            }
+            if (cleanId.includes('/folders/')) cleanId = cleanId.split('/folders/')[1].split('?')[0];
+            else if (cleanId.includes('/d/')) cleanId = cleanId.split('/d/')[1].split('/')[0].split('?')[0];
+            else if (cleanId.includes('id=')) cleanId = cleanId.split('id=')[1].split('&')[0];
             return cleanId;
         }
 
@@ -568,22 +685,21 @@
             document.getElementById('apiKeyInput').value = apiKey;
             document.getElementById('sheetUrlInput').value = sheetUrl;
 
-            // Render UI immediately using local data for speed
             renderAdminServicesList();
             renderAboutInfo();
+            renderAdminPackagesList();
+            renderPackageCatalogCards();
             renderCategories();
             renderAdminCategoryList();
             loadActiveImages();
 
-            // Enable Desktop Drag & MouseWheel Scrolling for Category containers
             setupDesktopHorizontalScroll('categoryContainer');
             setupDesktopHorizontalScroll('subcategoryContainer');
+            setupDesktopHorizontalScroll('packageSubTabs');
 
-            // Setup Mobile Scroll Hints Fade Listener
             setupMobileScrollHintListener('categoryContainer', 'categoryFadeHint');
             setupMobileScrollHintListener('subcategoryContainer', 'subcategoryFadeHint');
 
-            // Background restore from Google Sheet without blocking initial render
             if (sheetUrl) {
                 restoreFromSheet(true);
             }
@@ -593,14 +709,8 @@
             updateGridCols(initialSliderVal);
 
             const touchArea = document.getElementById('lightboxTouchArea');
-            touchArea.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-
-            touchArea.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipeGesture();
-            }, { passive: true });
+            touchArea.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+            touchArea.addEventListener('touchend', (e) => { touchEndX = e.changedTouches[0].screenX; handleSwipeGesture(); }, { passive: true });
 
             document.addEventListener('keydown', (e) => {
                 const lightbox = document.getElementById('lightbox');
@@ -627,11 +737,8 @@
 
             const checkScroll = () => {
                 const maxScrollLeft = container.scrollWidth - container.clientWidth;
-                if (maxScrollLeft <= 10 || container.scrollLeft >= maxScrollLeft - 10) {
-                    hint.style.opacity = '0';
-                } else {
-                    hint.style.opacity = '1';
-                }
+                if (maxScrollLeft <= 10 || container.scrollLeft >= maxScrollLeft - 10) hint.style.opacity = '0';
+                else hint.style.opacity = '1';
             };
 
             container.addEventListener('scroll', checkScroll, { passive: true });
@@ -643,26 +750,21 @@
             if (!container) return;
 
             let isDown = false;
-            let startX;
-            let scrollLeft;
+            let startX, scrollLeft;
 
             container.addEventListener('mousedown', (e) => {
                 isDown = true;
                 startX = e.pageX - container.offsetLeft;
                 scrollLeft = container.scrollLeft;
             });
-
             container.addEventListener('mouseleave', () => { isDown = false; });
             container.addEventListener('mouseup', () => { isDown = false; });
-
             container.addEventListener('mousemove', (e) => {
                 if (!isDown) return;
                 e.preventDefault();
                 const x = e.pageX - container.offsetLeft;
-                const walk = (x - startX) * 1.5;
-                container.scrollLeft = scrollLeft - walk;
+                container.scrollLeft = scrollLeft - (x - startX) * 1.5;
             });
-
             container.addEventListener('wheel', (e) => {
                 if (e.deltaY !== 0) {
                     e.preventDefault();
@@ -673,36 +775,275 @@
 
         function scrollCategory(containerId, distance) {
             const container = document.getElementById(containerId);
-            if (container) {
-                container.scrollBy({ left: distance, behavior: 'smooth' });
+            if (container) container.scrollBy({ left: distance, behavior: 'smooth' });
+        }
+
+        function togglePackageCatalogCollapse() {
+            const content = document.getElementById('packageCatalogContent');
+            const btnText = document.getElementById('packageCatalogBtnText');
+            const arrow = document.getElementById('packageCatalogBtnArrow');
+            
+            isPackageCatalogExpanded = !isPackageCatalogExpanded;
+            if (isPackageCatalogExpanded) {
+                content.classList.remove('hidden');
+                btnText.innerText = 'ซ่อนแพ็คเกจ';
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                btnText.innerText = 'แตะเพื่อดู';
+                arrow.style.transform = 'rotate(0deg)';
             }
         }
 
-        function collapseAboutAndScroll() {
-            const body = document.getElementById('aboutCollapsibleBody');
-            const text = document.getElementById('aboutToggleText');
-            const arrow = document.getElementById('aboutToggleArrow');
-            const btn = document.getElementById('aboutToggleBtn');
+        function switchPackageTab(tabType) {
+            activePackageTab = tabType;
+            ['all', 'selfie', 'profile', 'rental'].forEach(t => {
+                const el = document.getElementById(`pkgTab-${t}`);
+                if (el) {
+                    el.className = t === tabType 
+                        ? "px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 bg-amber-400 text-black"
+                        : "px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 bg-neutral-900 text-neutral-400 border border-neutral-800";
+                }
+            });
+            renderPackageCatalogCards();
+        }
 
-            if (body && isAboutExpanded) {
-                isAboutExpanded = false;
-                body.classList.remove('max-h-[2500px]', 'opacity-100');
-                body.classList.add('max-h-0', 'opacity-0');
-                if (text) text.innerText = 'ทำความรู้จักเราเพิ่มเติม';
-                if (arrow) arrow.style.transform = 'rotate(0deg)';
-                if (btn) btn.classList.add('animate-cta');
+        function renderPackageCatalogCards() {
+            const grid = document.getElementById('packageCardsGrid');
+            if (!grid) return;
+
+            const filtered = activePackageTab === 'all' 
+                ? studioPackages 
+                : studioPackages.filter(p => p.type === activePackageTab);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p class="text-xs text-neutral-500 col-span-2 text-center py-6">ยังไม่มีแพ็คเกจในหมวดหมู่นี้</p>';
+                return;
             }
+
+            grid.innerHTML = filtered.map(pkg => {
+                const featuresList = (pkg.featuresText || '').split('\n').filter(f => f.trim() !== '');
+                return `
+                    <div class="bg-neutral-950/90 border border-neutral-800/90 hover:border-amber-500/50 rounded-2xl p-3.5 space-y-2.5 flex flex-col justify-between shadow-lg transition duration-300">
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-start gap-2">
+                                <h4 class="text-xs sm:text-sm font-bold text-amber-300 leading-snug">${escapeHtml(pkg.title)}</h4>
+                                <span class="px-2 py-0.5 bg-neutral-900 border border-neutral-800 text-[9px] font-semibold text-neutral-400 rounded-md shrink-0">037STUDIO</span>
+                            </div>
+                            <p class="text-[11px] text-neutral-400 font-light leading-none">${escapeHtml(pkg.subtitle)}</p>
+                            
+                            <div class="grid grid-cols-2 gap-1.5 pt-1">
+                                ${pkg.price1_time ? `
+                                    <div class="bg-neutral-900 border border-neutral-800/90 p-1.5 rounded-xl text-center">
+                                        <span class="text-[10px] text-neutral-400 block">${escapeHtml(pkg.price1_time)}</span>
+                                        <span class="text-xs font-bold text-amber-400">${escapeHtml(pkg.price1_val)}</span>
+                                        <span class="text-[9px] text-emerald-400 font-medium block truncate">${escapeHtml(pkg.price1_gift)}</span>
+                                    </div>
+                                ` : ''}
+                                ${pkg.price2_time ? `
+                                    <div class="bg-neutral-900 border border-neutral-800/90 p-1.5 rounded-xl text-center">
+                                        <span class="text-[10px] text-neutral-400 block">${escapeHtml(pkg.price2_time)}</span>
+                                        <span class="text-xs font-bold text-amber-400">${escapeHtml(pkg.price2_val)}</span>
+                                        <span class="text-[9px] text-emerald-400 font-medium block truncate">${escapeHtml(pkg.price2_gift)}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <ul class="text-[10px] text-neutral-300/90 space-y-1 pt-1.5 border-t border-neutral-900">
+                                ${featuresList.map(f => `<li class="flex items-start gap-1"><span>•</span><span>${escapeHtml(f)}</span></li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-1.5 pt-2 border-t border-neutral-900">
+                            <button 
+                                onclick="navigateToPackageCategory('${pkg.categoryId}', '${pkg.subcategoryId}')" 
+                                class="flex-1 bg-neutral-900 hover:bg-neutral-800 text-amber-300 border border-amber-500/30 py-1.5 px-2 rounded-xl text-[11px] font-semibold transition active:scale-95 flex items-center justify-center gap-1"
+                            >
+                                <span>📸</span> ดูรูปตัวอย่าง
+                            </button>
+                            <div class="grid grid-cols-2 gap-1.5 flex-1">
+                                <button 
+                                    onclick="openBookingWebsite()" 
+                                    class="w-full bg-amber-500 hover:bg-amber-400 text-black py-1.5 px-2 rounded-xl text-[11px] font-bold transition active:scale-95 flex items-center justify-center gap-1 shadow-md shadow-amber-500/10"
+                                >
+                                    <span>📅</span> จองคิว
+                                </button>
+                                <button 
+                                    onclick="openLineApp('${escapeHtml(pkg.title)}')" 
+                                    class="w-full bg-emerald-500 hover:bg-emerald-400 text-black py-1.5 px-2 rounded-xl text-[11px] font-bold transition active:scale-95 flex items-center justify-center gap-1 shadow-md shadow-emerald-500/10"
+                                >
+                                    <img src="${DEFAULT_LINE_LOGO_URL}" alt="LINE" class="w-3.5 h-3.5 object-contain rounded-full shrink-0">
+                                    <span class="truncate">สอบถาม/จองคิว</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function navigateToPackageCategory(catId, subId = '') {
+            if (!catId) {
+                showToast('แพ็คเกจนี้ยังไม่ได้ตั้งค่าลิงก์หมวดหมู่รูปภาพ', true);
+                return;
+            }
+            activeCategoryId = catId;
+            activeSubcategoryId = subId || null;
+            updateUrlCategory(catId, subId || null);
+            renderCategories();
+            loadActiveImages();
 
             setTimeout(() => {
                 const headerEl = document.getElementById('activeCategoryHeader');
-                if (headerEl) {
-                    headerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
+                if (headerEl) headerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
+        }
+
+        // ADMIN PACKAGE MANAGEMENT FUNCTIONS
+        function renderAdminPackagesList() {
+            const container = document.getElementById('adminPackagesList');
+            if (!container) return;
+
+            const categoryOptions = [];
+            categories.forEach(cat => {
+                categoryOptions.push({ value: `${cat.id}|`, label: `📁 หมวดหมู่หลัก: ${cat.name}` });
+                if (cat.subcategories) {
+                    cat.subcategories.forEach(sub => {
+                        categoryOptions.push({ value: `${cat.id}|${sub.id}`, label: `└─ 📂 ${cat.name} > ${sub.name}` });
+                    });
+                }
+            });
+
+            container.innerHTML = studioPackages.map((pkg, idx) => {
+                const currentCatValue = `${pkg.categoryId || ''}|${pkg.subcategoryId || ''}`;
+                return `
+                    <div class="bg-neutral-950 p-3.5 rounded-2xl border border-neutral-800/80 space-y-2.5">
+                        <div class="flex justify-between items-center border-b border-neutral-900 pb-2">
+                            <span class="text-xs font-bold text-amber-400">แพ็คเกจที่ ${idx + 1}</span>
+                            <div class="flex gap-2">
+                                <select id="pkg_type_${idx}" onchange="updateAdminPackage(${idx})" class="bg-neutral-900 border border-neutral-800 text-neutral-300 text-[11px] rounded-lg px-2 py-1">
+                                    <option value="selfie" ${pkg.type === 'selfie' ? 'selected' : ''}>📸 เซลฟี่สตู</option>
+                                    <option value="profile" ${pkg.type === 'profile' ? 'selected' : ''}>👤 ถ่ายโปรไฟล์</option>
+                                    <option value="rental" ${pkg.type === 'rental' ? 'selected' : ''}>🏠 เช่าสตูดิโอ</option>
+                                </select>
+                                <button onclick="deleteAdminPackage(${idx})" class="text-[10px] text-red-400 border border-red-900/30 bg-red-950/20 px-2.5 py-1 rounded-lg">ลบแพ็คเกจ</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[10px] text-neutral-500 mb-0.5">ชื่อแพ็คเกจ:</label>
+                                <input type="text" id="pkg_title_${idx}" value="${escapeHtml(pkg.title)}" onchange="updateAdminPackage(${idx})" placeholder="ชื่อแพ็คเกจ" class="w-full bg-neutral-900 border border-neutral-800 p-2 rounded-xl text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-neutral-500 mb-0.5">คำอธิบายย่อ:</label>
+                                <input type="text" id="pkg_subtitle_${idx}" value="${escapeHtml(pkg.subtitle)}" onchange="updateAdminPackage(${idx})" placeholder="รายละเอียดสั้นๆ" class="w-full bg-neutral-900 border border-neutral-800 p-2 rounded-xl text-xs text-white">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-neutral-900/50 p-2.5 rounded-xl border border-neutral-900">
+                            <div class="space-y-1.5">
+                                <span class="text-[10px] font-semibold text-amber-300 block">ราคาแบบที่ 1:</span>
+                                <div class="grid grid-cols-3 gap-1">
+                                    <input type="text" id="pkg_p1_time_${idx}" value="${escapeHtml(pkg.price1_time)}" onchange="updateAdminPackage(${idx})" placeholder="เช่น 10 นาที" class="bg-neutral-950 border border-neutral-800 p-1.5 rounded text-[11px] text-white">
+                                    <input type="text" id="pkg_p1_val_${idx}" value="${escapeHtml(pkg.price1_val)}" onchange="updateAdminPackage(${idx})" placeholder="เช่น 199.-" class="bg-neutral-950 border border-neutral-800 p-1.5 rounded text-[11px] text-amber-400 font-bold">
+                                    <input type="text" id="pkg_p1_gift_${idx}" value="${escapeHtml(pkg.price1_gift)}" onchange="updateAdminPackage(${idx})" placeholder="ข้อความของแถม" class="bg-neutral-950 border border-neutral-800 p-1.5 rounded text-[11px] text-emerald-400">
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <span class="text-[10px] font-semibold text-amber-300 block">ราคาแบบที่ 2 (ถ้ามี):</span>
+                                <div class="grid grid-cols-3 gap-1">
+                                    <input type="text" id="pkg_p2_time_${idx}" value="${escapeHtml(pkg.price2_time)}" onchange="updateAdminPackage(${idx})" placeholder="เช่น 20 นาที" class="bg-neutral-950 border border-neutral-800 p-1.5 rounded text-[11px] text-white">
+                                    <input type="text" id="pkg_p2_val_${idx}" value="${escapeHtml(pkg.price2_val)}" onchange="updateAdminPackage(${idx})" placeholder="เช่น 350.-" class="bg-neutral-950 border border-neutral-800 p-1.5 rounded text-[11px] text-amber-400 font-bold">
+                                    <input type="text" id="pkg_p2_gift_${idx}" value="${escapeHtml(pkg.price2_gift)}" onchange="updateAdminPackage(${idx})" placeholder="ข้อความของแถม" class="bg-neutral-950 border border-neutral-800 p-1.5 rounded text-[11px] text-emerald-400">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] text-neutral-400 mb-1">🔗 ลิงก์หมวดหมู่รูปภาพตัวอย่าง เมื่อกดปุ่ม "ดูรูปตัวอย่าง":</label>
+                            <select id="pkg_category_${idx}" onchange="updateAdminPackage(${idx})" class="w-full bg-neutral-900 border border-neutral-800 p-2 rounded-xl text-xs text-amber-300 font-medium">
+                                <option value="|">-- ไม่ระบุ (ไม่ลิงก์) --</option>
+                                ${categoryOptions.map(opt => `<option value="${opt.value}" ${opt.value === currentCatValue ? 'selected' : ''}>${opt.label}</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] text-neutral-400 mb-0.5">จุดเด่น / รายละเอียดบริการ (บรรทัดละ 1 ข้อ):</label>
+                            <textarea id="pkg_features_${idx}" rows="3" onchange="updateAdminPackage(${idx})" placeholder="พิมพ์จุดเด่นย่อยแต่ละข้อลงในคนละบรรทัด..." class="w-full bg-neutral-900 border border-neutral-800 p-2 rounded-xl text-xs text-neutral-200">${escapeHtml(pkg.featuresText || '')}</textarea>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addNewAdminPackage() {
+            const newPkg = {
+                id: 'pkg-' + Date.now().toString().slice(-6),
+                type: 'selfie',
+                categoryId: categories[0]?.id || '',
+                subcategoryId: '',
+                title: 'แพ็คเกจใหม่',
+                subtitle: 'คำอธิบายแพ็คเกจสั้นๆ',
+                price1_time: '10 นาที',
+                price1_val: '199.-',
+                price1_gift: 'แถมฟรีไฟล์รูป',
+                price2_time: '',
+                price2_val: '',
+                price2_gift: '',
+                featuresText: 'ปรับแต่งภาพผิวขาวใส\nได้ไฟล์ภาพทั้งหมดหลังถ่ายทันที'
+            };
+            studioPackages.push(newPkg);
+            saveStudioPackages();
+            renderAdminPackagesList();
+            renderPackageCatalogCards();
+            showToast('เพิ่มแพ็คเกจใหม่เรียบร้อยแล้ว');
+        }
+
+        function updateAdminPackage(idx) {
+            if (!studioPackages[idx]) return;
+
+            const catVal = document.getElementById(`pkg_category_${idx}`).value;
+            const [catId, subId] = catVal.split('|');
+
+            studioPackages[idx] = {
+                ...studioPackages[idx],
+                type: document.getElementById(`pkg_type_${idx}`).value,
+                title: document.getElementById(`pkg_title_${idx}`).value.trim(),
+                subtitle: document.getElementById(`pkg_subtitle_${idx}`).value.trim(),
+                price1_time: document.getElementById(`pkg_p1_time_${idx}`).value.trim(),
+                price1_val: document.getElementById(`pkg_p1_val_${idx}`).value.trim(),
+                price1_gift: document.getElementById(`pkg_p1_gift_${idx}`).value.trim(),
+                price2_time: document.getElementById(`pkg_p2_time_${idx}`).value.trim(),
+                price2_val: document.getElementById(`pkg_p2_val_${idx}`).value.trim(),
+                price2_gift: document.getElementById(`pkg_p2_gift_${idx}`).value.trim(),
+                categoryId: catId || '',
+                subcategoryId: subId || '',
+                featuresText: document.getElementById(`pkg_features_${idx}`).value.trim()
+            };
+
+            saveStudioPackages();
+            renderPackageCatalogCards();
+        }
+
+        function deleteAdminPackage(idx) {
+            if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบแพ็คเกจนี้?')) {
+                studioPackages.splice(idx, 1);
+                saveStudioPackages();
+                renderAdminPackagesList();
+                renderPackageCatalogCards();
+                showToast('ลบแพ็คเกจเรียบร้อยแล้ว');
+            }
+        }
+
+        function saveStudioPackages() {
+            localStorage.setItem('photo_portfolio_packages', JSON.stringify(studioPackages));
+            if (sheetUrl) backupToSheet();
         }
 
         function navigateToServiceCategory(serviceTitle) {
             if (!serviceTitle) return;
+            closeAboutSheet();
             const cleanTitle = serviceTitle.trim().toLowerCase();
 
             const targetCat = categories.find(c => c.name.trim().toLowerCase() === cleanTitle || c.id === cleanTitle);
@@ -739,16 +1080,16 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <div>
-                            <label class="block text-[10px] text-neutral-500 mb-0.5">ชื่อบริการ (ตรงกับชื่อหมวดหมู่):</label>
-                            <input type="text" id="svc_title_${index}" value="${escapeHtml(svc.title)}" placeholder="ชื่อบริการ" class="w-full bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
+                            <label class="block text-[10px] text-neutral-500 mb-0.5">ชื่อบริการ:</label>
+                            <input type="text" id="svc_title_${index}" value="${escapeHtml(svc.title)}" class="w-full bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
                         </div>
                         <div>
-                            <label class="block text-[10px] text-neutral-500 mb-0.5">ลิงก์รูปตัวอย่าง (Google Drive Link):</label>
-                            <input type="text" id="svc_img_${index}" value="${escapeHtml(svc.imgUrl)}" placeholder="วางลิงก์ https://drive.google.com/..." class="w-full bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
+                            <label class="block text-[10px] text-neutral-500 mb-0.5">ลิงก์รูปตัวอย่าง:</label>
+                            <input type="text" id="svc_img_${index}" value="${escapeHtml(svc.imgUrl)}" class="w-full bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
                         </div>
                         <div>
                             <label class="block text-[10px] text-neutral-500 mb-0.5">รายละเอียดบริการย่อ:</label>
-                            <input type="text" id="svc_desc_${index}" value="${escapeHtml(svc.desc)}" placeholder="คำอธิบายบริการแบบย่อ" class="w-full bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
+                            <input type="text" id="svc_desc_${index}" value="${escapeHtml(svc.desc)}" class="w-full bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-white">
                         </div>
                     </div>
                 </div>
@@ -769,34 +1110,12 @@
             }
         }
 
-        function toggleAboutCollapse() {
-            const body = document.getElementById('aboutCollapsibleBody');
-            const text = document.getElementById('aboutToggleText');
-            const arrow = document.getElementById('aboutToggleArrow');
-            const btn = document.getElementById('aboutToggleBtn');
-
-            isAboutExpanded = !isAboutExpanded;
-
-            if (isAboutExpanded) {
-                body.classList.remove('max-h-0', 'opacity-0');
-                body.classList.add('max-h-[2500px]', 'opacity-100');
-                text.innerText = 'ย่อปิดข้อมูลร้าน';
-                arrow.style.transform = 'rotate(180deg)';
-                btn.classList.remove('animate-cta');
-            } else {
-                body.classList.remove('max-h-[2500px]', 'opacity-100');
-                body.classList.add('max-h-0', 'opacity-0');
-                text.innerText = 'ทำความรู้จักเราเพิ่มเติม';
-                arrow.style.transform = 'rotate(0deg)';
-                btn.classList.add('animate-cta');
-            }
-        }
-
         function renderAboutInfo() {
             document.getElementById('displayShopName').innerText = aboutInfo.shopName || '037Studio';
             document.getElementById('displayOwnerName').innerText = aboutInfo.ownerName ? `บริหารงานโดย ${aboutInfo.ownerName}` : '';
             document.getElementById('displayAboutBio').innerText = aboutInfo.aboutBio || '';
             if (document.getElementById('adminLineId')) document.getElementById('adminLineId').value = aboutInfo.lineId || '@037studio';
+            if (document.getElementById('adminBookingUrl')) document.getElementById('adminBookingUrl').value = aboutInfo.bookingUrl || DEFAULT_BOOKING_URL;
 
             let formattedLogoUrl = formatImageUrl(aboutInfo.shopLogoUrl || aboutInfo.shopImgUrl, 'w1200');
             let formattedImgUrl = formatImageUrl(aboutInfo.shopImgUrl, 'w1200');
@@ -804,6 +1123,7 @@
             document.getElementById('displayShopImg').src = formattedImgUrl;
             document.getElementById('aboutSectionLogo').src = formattedLogoUrl;
             document.getElementById('headerLogoImg').src = formattedLogoUrl;
+            document.getElementById('floatingLogoImg').src = formattedLogoUrl;
 
             const svcs = aboutInfo.services || DEFAULT_ABOUT.services;
             const container = document.getElementById('servicesContainer');
@@ -816,19 +1136,11 @@
             container.innerHTML = svcs.map((svc) => {
                 let svcImg = formatImageUrl(svc.imgUrl, 'w800');
                 return `
-                    <div 
-                        onclick="navigateToServiceCategory('${escapeHtml(svc.title)}')"
-                        class="bg-neutral-950/90 border border-neutral-800 hover:border-amber-500/60 rounded-2xl overflow-hidden group transition duration-300 cursor-pointer flex flex-col justify-between shadow-lg hover:shadow-amber-500/10 active:scale-[0.98]"
-                    >
+                    <div onclick="navigateToServiceCategory('${escapeHtml(svc.title)}')" class="bg-neutral-950/90 border border-neutral-800 hover:border-amber-500/60 rounded-2xl overflow-hidden group transition duration-300 cursor-pointer flex flex-col justify-between shadow-lg hover:shadow-amber-500/10 active:scale-[0.98]">
                         ${svcImg ? `
                             <div class="aspect-[16/9] overflow-hidden bg-neutral-900 relative">
                                 <img src="${svcImg}" alt="${escapeHtml(svc.title)}" onerror="this.src='${DEFAULT_LOGO_URL}'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" decoding="async">
-                                <button 
-                                    onclick="event.stopPropagation(); openCustomSingleImage('${svcImg}', '${escapeHtml(svc.title)}')" 
-                                    class="absolute bottom-2 right-2 bg-neutral-950/80 backdrop-blur-md text-[10px] text-neutral-300 px-2 py-1 rounded-lg border border-neutral-800 hover:text-white"
-                                >
-                                    🔍 ขยายภาพ
-                                </button>
+                                <button onclick="event.stopPropagation(); openCustomSingleImage('${svcImg}', '${escapeHtml(svc.title)}')" class="absolute bottom-2 right-2 bg-neutral-950/80 backdrop-blur-md text-[10px] text-neutral-300 px-2 py-1 rounded-lg border border-neutral-800 hover:text-white">🔍 ขยายภาพ</button>
                             </div>
                         ` : ''}
                         <div class="p-3 space-y-1.5">
@@ -844,6 +1156,7 @@
         }
 
         function openCustomSingleImage(src, title) {
+            closeAboutSheet();
             loadedImages = [{ fullSrc: src, name: title, gridSrc: src }];
             openLightbox(0);
         }
@@ -851,6 +1164,7 @@
         function saveAboutInfo() {
             aboutInfo.shopName = document.getElementById('adminShopName').value.trim();
             aboutInfo.lineId = document.getElementById('adminLineId').value.trim();
+            aboutInfo.bookingUrl = document.getElementById('adminBookingUrl').value.trim() || DEFAULT_BOOKING_URL;
             aboutInfo.ownerName = document.getElementById('adminOwnerName').value.trim();
             aboutInfo.shopLogoUrl = document.getElementById('adminShopLogoUrl').value.trim();
             aboutInfo.shopImgUrl = document.getElementById('adminShopImgUrl').value.trim();
@@ -858,26 +1172,23 @@
             
             if (!aboutInfo.services) aboutInfo.services = [];
             let updatedServices = [];
-            
             for (let i = 0; i < aboutInfo.services.length; i++) {
                 let titleEl = document.getElementById(`svc_title_${i}`);
                 let imgEl = document.getElementById(`svc_img_${i}`);
                 let descEl = document.getElementById(`svc_desc_${i}`);
 
                 if (titleEl && imgEl && descEl) {
-                    updatedServices.push({
-                        title: titleEl.value.trim(),
-                        imgUrl: imgEl.value.trim(),
-                        desc: descEl.value.trim()
-                    });
+                    updatedServices.push({ title: titleEl.value.trim(), imgUrl: imgEl.value.trim(), desc: descEl.value.trim() });
                 }
             }
             aboutInfo.services = updatedServices;
 
             localStorage.setItem('photo_portfolio_about', JSON.stringify(aboutInfo));
+            saveStudioPackages();
             renderAboutInfo();
             renderAdminServicesList();
-            showToast('บันทึกข้อมูลเรียบร้อยแล้ว');
+            renderAdminPackagesList();
+            showToast('บันทึกข้อมูลตั้งค่าทั้งหมดเรียบร้อยแล้ว');
             
             if (sheetUrl) backupToSheet();
         }
@@ -906,7 +1217,8 @@
             const payload = {
                 apiKey: apiKey,
                 categories: categories,
-                aboutInfo: aboutInfo
+                aboutInfo: aboutInfo,
+                studioPackages: studioPackages
             };
 
             try {
@@ -937,11 +1249,17 @@
                         categories = data.categories;
                         saveCategoriesLocallyOnly();
                     }
+
+                    if (data.studioPackages && Array.isArray(data.studioPackages) && data.studioPackages.length > 0) {
+                        studioPackages = data.studioPackages;
+                        localStorage.setItem('photo_portfolio_packages', JSON.stringify(studioPackages));
+                    }
                     
                     if (data.aboutInfo && Object.keys(data.aboutInfo).length > 0) {
                         aboutInfo = {
                             shopName: data.aboutInfo.shopName || aboutInfo.shopName,
                             lineId: data.aboutInfo.lineId || aboutInfo.lineId || '@037studio',
+                            bookingUrl: data.aboutInfo.bookingUrl || aboutInfo.bookingUrl || DEFAULT_BOOKING_URL,
                             ownerName: data.aboutInfo.ownerName || aboutInfo.ownerName,
                             shopLogoUrl: data.aboutInfo.shopLogoUrl || aboutInfo.shopLogoUrl || DEFAULT_LOGO_URL,
                             shopImgUrl: data.aboutInfo.shopImgUrl || aboutInfo.shopImgUrl || DEFAULT_LOGO_URL,
@@ -953,6 +1271,7 @@
                         
                         if (document.getElementById('adminShopName')) document.getElementById('adminShopName').value = aboutInfo.shopName;
                         if (document.getElementById('adminLineId')) document.getElementById('adminLineId').value = aboutInfo.lineId;
+                        if (document.getElementById('adminBookingUrl')) document.getElementById('adminBookingUrl').value = aboutInfo.bookingUrl;
                         if (document.getElementById('adminOwnerName')) document.getElementById('adminOwnerName').value = aboutInfo.ownerName;
                         if (document.getElementById('adminShopLogoUrl')) document.getElementById('adminShopLogoUrl').value = aboutInfo.shopLogoUrl;
                         if (document.getElementById('adminShopImgUrl')) document.getElementById('adminShopImgUrl').value = aboutInfo.shopImgUrl;
@@ -970,6 +1289,8 @@
 
                     renderCategories();
                     renderAdminCategoryList();
+                    renderAdminPackagesList();
+                    renderPackageCatalogCards();
                     loadActiveImages();
                     
                     if (!silent) showToast('ดึงข้อมูลกู้คืนจาก Google ชีทสำเร็จ');
@@ -986,43 +1307,27 @@
 
         function saveCategories() {
             saveCategoriesLocallyOnly();
-            if (sheetUrl) {
-                backupToSheet();
-            }
+            if (sheetUrl) backupToSheet();
         }
 
         function handleSwipeGesture() {
             const swipeThreshold = 40;
-            if (touchEndX < touchStartX - swipeThreshold) {
-                nextLightboxImage();
-            }
-            if (touchEndX > touchStartX + swipeThreshold) {
-                prevLightboxImage();
-            }
+            if (touchEndX < touchStartX - swipeThreshold) nextLightboxImage();
+            if (touchEndX > touchStartX + swipeThreshold) prevLightboxImage();
         }
 
         function updateGridCols(val) {
             document.getElementById('gridSliderVal').innerText = `${val}/แถว`;
             const imageGrid = document.getElementById('imageGrid');
-            
             imageGrid.className = imageGrid.className.replace(/grid-cols-\d+/g, '').trim();
-            
-            const colClasses = {
-                '1': 'grid-cols-1',
-                '2': 'grid-cols-2',
-                '3': 'grid-cols-3',
-                '4': 'grid-cols-4'
-            };
-
+            const colClasses = { '1': 'grid-cols-1', '2': 'grid-cols-2', '3': 'grid-cols-3', '4': 'grid-cols-4' };
             imageGrid.className = `grid ${colClasses[val] || 'grid-cols-2'} gap-1.5 sm:gap-3.5 transition-all duration-300`;
         }
 
         function updateUrlCategory(catId, subId = null) {
             const url = new URL(window.location.origin + window.location.pathname);
             url.searchParams.set('cat', catId);
-            if (subId) {
-                url.searchParams.set('sub', subId);
-            }
+            if (subId) url.searchParams.set('sub', subId);
             window.history.pushState({ catId, subId }, '', url.toString());
         }
 
@@ -1033,12 +1338,9 @@
         function copyCategoryLinkById(catId, subId = null) {
             const cat = categories.find(c => c.id === catId);
             const sub = cat?.subcategories?.find(s => s.id === subId);
-            
             const url = new URL(window.location.origin + window.location.pathname);
             url.searchParams.set('cat', catId);
-            if (subId) {
-                url.searchParams.set('sub', subId);
-            }
+            if (subId) url.searchParams.set('sub', subId);
 
             const title = sub ? `${cat?.name} > ${sub.name}` : cat?.name;
             copyToClipboard(url.toString(), `คัดลอกลิงก์หมวดหมู่ "${title || ''}" เรียบร้อยแล้ว`);
@@ -1051,12 +1353,10 @@
 
             document.title = fullTitle;
             if (document.getElementById('metaTitle')) document.getElementById('metaTitle').innerText = fullTitle;
-
             if (document.getElementById('ogTitle')) document.getElementById('ogTitle').setAttribute('content', fullTitle);
             if (document.getElementById('ogDesc')) document.getElementById('ogDesc').setAttribute('content', description || 'สตูดิโอถ่ายภาพ ผลงานคุณภาพ');
             if (document.getElementById('ogImage')) document.getElementById('ogImage').setAttribute('content', formattedCover);
             if (document.getElementById('ogUrl')) document.getElementById('ogUrl').setAttribute('content', currentUrl);
-
             if (document.getElementById('twTitle')) document.getElementById('twTitle').setAttribute('content', fullTitle);
             if (document.getElementById('twDesc')) document.getElementById('twDesc').setAttribute('content', description || 'สตูดิโอถ่ายภาพ ผลงานคุณภาพ');
             if (document.getElementById('twImage')) document.getElementById('twImage').setAttribute('content', formattedCover);
@@ -1064,11 +1364,7 @@
 
         function copyToClipboard(text, successMessage) {
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast(successMessage);
-                }).catch(() => {
-                    fallbackCopy(text, successMessage);
-                });
+                navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(() => fallbackCopy(text, successMessage));
             } else {
                 fallbackCopy(text, successMessage);
             }
@@ -1091,7 +1387,6 @@
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
             const icon = document.getElementById('toastIcon');
-            
             document.getElementById('toastMessage').innerText = msg;
             
             if (isError) {
@@ -1117,35 +1412,17 @@
             
             if (isHidden) {
                 const passwordInput = prompt('กรุณากรอกรหัสผ่านเพื่อเข้าสู่ระบบหลังบ้าน:');
-                
                 if (passwordInput === null) return;
-                
                 if (passwordInput === ADMIN_PASSWORD) {
                     panel.classList.remove('hidden');
                     showToast('เข้าสู่ระบบหลังบ้านสำเร็จ');
+                    renderAdminPackagesList();
                     panel.scrollIntoView({ behavior: 'smooth' });
                 } else {
                     showToast('รหัสผ่านไม่ถูกต้อง!', true);
                 }
             } else {
                 panel.classList.add('hidden');
-            }
-        }
-
-        function togglePackageCollapse() {
-            const desc = document.getElementById('packageDescription');
-            const btn = document.getElementById('packageToggleBtn');
-            
-            isPackageExpanded = !isPackageExpanded;
-            
-            if (isPackageExpanded) {
-                desc.classList.remove('max-h-20');
-                desc.classList.add('max-h-[1000px]');
-                btn.innerText = '▲ ย่อเก็บ';
-            } else {
-                desc.classList.remove('max-h-[1000px]');
-                desc.classList.add('max-h-20');
-                btn.innerText = '▼ อ่านเพิ่มเติม';
             }
         }
 
@@ -1199,19 +1476,8 @@
                 subContainer.innerHTML = '';
             }
 
-            const packageCard = document.getElementById('packageCard');
-            const packageDescription = document.getElementById('packageDescription');
-            const packageTitle = document.getElementById('packageTitle');
-            const toggleBtn = document.getElementById('packageToggleBtn');
-
-            isPackageExpanded = false;
-            packageDescription.classList.remove('max-h-[1000px]');
-            packageDescription.classList.add('max-h-20');
-            if (toggleBtn) toggleBtn.innerText = '▼ อ่านเพิ่มเติม';
-
             if (currentCat) {
                 const currentSub = currentCat.subcategories?.find(s => s.id === activeSubcategoryId);
-                
                 let descText = '';
                 let titleText = '';
 
@@ -1227,35 +1493,17 @@
                     titleText = currentCat.name;
                 }
 
-                if (packageTitle) packageTitle.innerText = `แพ็คเกจราคา: ${titleText}`;
                 updateOpenGraphMeta(titleText, descText, window.location.href);
-
-                if (descText.trim()) {
-                    packageDescription.innerText = descText;
-                    packageCard.classList.remove('hidden');
-
-                    if (descText.split('\n').length > 3 || descText.length > 100) {
-                        toggleBtn.classList.remove('hidden');
-                    } else {
-                        toggleBtn.classList.add('hidden');
-                        packageDescription.classList.remove('max-h-20');
-                    }
-                } else {
-                    packageCard.classList.add('hidden');
-                }
             }
 
             setTimeout(() => {
                 const cHint = document.getElementById('categoryFadeHint');
                 const cCont = document.getElementById('categoryContainer');
-                if (cHint && cCont) {
-                    cHint.style.opacity = (cCont.scrollWidth - cCont.clientWidth > 10) ? '1' : '0';
-                }
+                if (cHint && cCont) cHint.style.opacity = (cCont.scrollWidth - cCont.clientWidth > 10) ? '1' : '0';
+
                 const sHint = document.getElementById('subcategoryFadeHint');
                 const sCont = document.getElementById('subcategoryContainer');
-                if (sHint && sCont) {
-                    sHint.style.opacity = (sCont.scrollWidth - sCont.clientWidth > 10) ? '1' : '0';
-                }
+                if (sHint && sCont) sHint.style.opacity = (sCont.scrollWidth - sCont.clientWidth > 10) ? '1' : '0';
             }, 100);
         }
 
@@ -1270,20 +1518,8 @@
                             <button onclick="moveCategory(${idx}, -1)" ${idx === 0 ? 'disabled class="opacity-30 cursor-not-allowed text-xs bg-neutral-900 text-neutral-500 px-2 py-1 rounded-lg border border-neutral-800"' : 'class="text-xs bg-neutral-800 hover:bg-neutral-700 text-amber-400 px-2 py-1 rounded-lg border border-neutral-700 transition active:scale-95"'} title="ย้ายขึ้น">▲</button>
                             <button onclick="moveCategory(${idx}, 1)" ${idx === categories.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed text-xs bg-neutral-900 text-neutral-500 px-2 py-1 rounded-lg border border-neutral-800"' : 'class="text-xs bg-neutral-800 hover:bg-neutral-700 text-amber-400 px-2 py-1 rounded-lg border border-neutral-700 transition active:scale-95"'} title="ย้ายลง">▼</button>
                         </div>
-                        <input 
-                            type="text" 
-                            value="${escapeHtml(cat.name)}" 
-                            onchange="updateCategoryName('${cat.id}', this.value)"
-                            placeholder="ชื่อหมวดหมู่หลัก"
-                            class="w-full sm:w-40 bg-neutral-900 border border-neutral-800 p-2 rounded-lg text-xs font-bold text-white focus:outline-none"
-                        />
-                        <input 
-                            type="text" 
-                            value="${escapeHtml(cat.folderId)}" 
-                            onchange="updateFolderId('${cat.id}', this.value)"
-                            placeholder="Folder ID หรือ ลิงก์ Google Drive"
-                            class="flex-1 bg-neutral-900 border border-neutral-800 p-2 rounded-lg text-xs text-neutral-200 focus:outline-none"
-                        />
+                        <input type="text" value="${escapeHtml(cat.name)}" onchange="updateCategoryName('${cat.id}', this.value)" placeholder="ชื่อหมวดหมู่หลัก" class="w-full sm:w-40 bg-neutral-900 border border-neutral-800 p-2 rounded-lg text-xs font-bold text-white focus:outline-none"/>
+                        <input type="text" value="${escapeHtml(cat.folderId)}" onchange="updateFolderId('${cat.id}', this.value)" placeholder="Folder ID หรือ ลิงก์ Google Drive" class="flex-1 bg-neutral-900 border border-neutral-800 p-2 rounded-lg text-xs text-neutral-200 focus:outline-none"/>
                         <div class="flex gap-1.5 shrink-0 justify-end">
                             <button onclick="addNewSubcategory('${cat.id}')" class="text-[11px] bg-neutral-800 text-emerald-400 border border-emerald-900/30 px-2.5 py-1.5 rounded-lg">+ ย่อย</button>
                             <button onclick="copyCategoryLinkById('${cat.id}')" class="text-[11px] bg-neutral-800 text-neutral-300 px-2.5 py-1.5 rounded-lg">🔗 แชร์</button>
@@ -1291,12 +1527,7 @@
                         </div>
                     </div>
 
-                    <textarea 
-                        rows="2"
-                        onchange="updateCategoryDescription('${cat.id}', this.value)"
-                        placeholder="กรอกรายละเอียดแพ็คเกจและราคาของหมวดหมู่หลักนี้..."
-                        class="w-full bg-neutral-900/80 border border-neutral-800/80 p-2 rounded-lg text-xs text-amber-200/90 focus:outline-none focus:border-neutral-600 resize-y"
-                    >${escapeHtml(cat.description || '')}</textarea>
+                    <textarea rows="2" onchange="updateCategoryDescription('${cat.id}', this.value)" placeholder="กรอกรายละเอียดแพ็คเกจและราคาของหมวดหมู่หลักนี้..." class="w-full bg-neutral-900/80 border border-neutral-800/80 p-2 rounded-lg text-xs text-amber-200/90 focus:outline-none focus:border-neutral-600 resize-y">${escapeHtml(cat.description || '')}</textarea>
 
                     ${hasSubs ? `
                         <div class="pl-3 border-l-2 border-neutral-800 space-y-2 pt-1">
@@ -1304,35 +1535,17 @@
                                 <div class="bg-neutral-900/60 p-2.5 rounded-lg border border-neutral-800/50 space-y-2">
                                     <div class="flex flex-col sm:flex-row gap-1.5 items-stretch sm:items-center">
                                         <div class="flex items-center gap-1 shrink-0">
-                                            <button onclick="moveSubcategory('${cat.id}', ${subIdx}, -1)" ${subIdx === 0 ? 'disabled class="opacity-30 cursor-not-allowed text-[10px] bg-neutral-950 text-neutral-600 px-1.5 py-0.5 rounded border border-neutral-900"' : 'class="text-[10px] bg-neutral-800 hover:bg-neutral-700 text-amber-400 px-1.5 py-0.5 rounded border border-neutral-700 transition active:scale-95"'} title="ย้ายหมวดหมู่ย่อยขึ้น">▲</button>
-                                            <button onclick="moveSubcategory('${cat.id}', ${subIdx}, 1)" ${subIdx === cat.subcategories.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed text-[10px] bg-neutral-950 text-neutral-600 px-1.5 py-0.5 rounded border border-neutral-900"' : 'class="text-[10px] bg-neutral-800 hover:bg-neutral-700 text-amber-400 px-1.5 py-0.5 rounded border border-neutral-700 transition active:scale-95"'} title="ย้ายหมวดหมู่ย่อยลง">▼</button>
+                                            <button onclick="moveSubcategory('${cat.id}', ${subIdx}, -1)" ${subIdx === 0 ? 'disabled class="opacity-30 cursor-not-allowed text-[10px] bg-neutral-950 text-neutral-600 px-1.5 py-0.5 rounded border border-neutral-900"' : 'class="text-[10px] bg-neutral-800 hover:bg-neutral-700 text-amber-400 px-1.5 py-0.5 rounded border border-neutral-700 transition active:scale-95"'} title="ย้ายขึ้น">▲</button>
+                                            <button onclick="moveSubcategory('${cat.id}', ${subIdx}, 1)" ${subIdx === cat.subcategories.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed text-[10px] bg-neutral-950 text-neutral-600 px-1.5 py-0.5 rounded border border-neutral-900"' : 'class="text-[10px] bg-neutral-800 hover:bg-neutral-700 text-amber-400 px-1.5 py-0.5 rounded border border-neutral-700 transition active:scale-95"'} title="ย้ายลง">▼</button>
                                         </div>
-                                        <input 
-                                            type="text" 
-                                            value="${escapeHtml(sub.name)}" 
-                                            onchange="updateSubcategoryName('${cat.id}', '${sub.id}', this.value)"
-                                            placeholder="ชื่อหมวดหมู่ย่อย"
-                                            class="w-full sm:w-36 bg-neutral-950 border border-neutral-800 p-1.5 rounded text-xs text-neutral-200 focus:outline-none"
-                                        />
-                                        <input 
-                                            type="text" 
-                                            value="${escapeHtml(sub.folderId)}" 
-                                            onchange="updateSubfolderId('${cat.id}', '${sub.id}', this.value)"
-                                            placeholder="Folder ID หมวดหมู่ย่อย"
-                                            class="flex-1 bg-neutral-950 border border-neutral-800 p-1.5 rounded text-xs text-neutral-200 focus:outline-none"
-                                        />
+                                        <input type="text" value="${escapeHtml(sub.name)}" onchange="updateSubcategoryName('${cat.id}', '${sub.id}', this.value)" placeholder="ชื่อหมวดหมู่ย่อย" class="w-full sm:w-36 bg-neutral-950 border border-neutral-800 p-1.5 rounded text-xs text-neutral-200 focus:outline-none"/>
+                                        <input type="text" value="${escapeHtml(sub.folderId)}" onchange="updateSubfolderId('${cat.id}', '${sub.id}', this.value)" placeholder="Folder ID หมวดหมู่ย่อย" class="flex-1 bg-neutral-950 border border-neutral-800 p-1.5 rounded text-xs text-neutral-200 focus:outline-none"/>
                                         <div class="flex gap-1 shrink-0 justify-end">
                                             <button onclick="copyCategoryLinkById('${cat.id}', '${sub.id}')" class="text-[10px] bg-neutral-800 text-neutral-300 px-2 py-1 rounded">🔗 แชร์</button>
                                             <button onclick="deleteSubcategory('${cat.id}', '${sub.id}')" class="text-[10px] text-red-400 border border-red-900/30 px-2 py-1 rounded">ลบ</button>
                                         </div>
                                     </div>
-
-                                    <textarea 
-                                        rows="1"
-                                        onchange="updateSubcategoryDescription('${cat.id}', '${sub.id}', this.value)"
-                                        placeholder="รายละเอียดแพ็คเกจราคาของหมวดหมู่ย่อยนี้..."
-                                        class="w-full bg-neutral-950/80 border border-neutral-800/80 p-1.5 rounded text-[11px] text-amber-200/90 focus:outline-none focus:border-neutral-600 resize-y"
-                                    >${escapeHtml(sub.description || '')}</textarea>
+                                    <textarea rows="1" onchange="updateSubcategoryDescription('${cat.id}', '${sub.id}', this.value)" placeholder="รายละเอียดราคา..." class="w-full bg-neutral-950/80 border border-neutral-800/80 p-1.5 rounded text-[11px] text-amber-200/90 focus:outline-none resize-y">${escapeHtml(sub.description || '')}</textarea>
                                 </div>
                             `).join('')}
                         </div>
@@ -1344,32 +1557,27 @@
         function moveCategory(index, direction) {
             const targetIndex = index + direction;
             if (targetIndex < 0 || targetIndex >= categories.length) return;
-            
             const temp = categories[index];
             categories[index] = categories[targetIndex];
             categories[targetIndex] = temp;
-            
             saveCategories();
             renderCategories();
             renderAdminCategoryList();
-            showToast('ปรับย้ายลำดับหมวดหมู่หลักเรียบร้อยแล้ว');
+            renderAdminPackagesList();
         }
 
         function moveSubcategory(catId, subIndex, direction) {
             const cat = categories.find(c => c.id === catId);
             if (!cat || !cat.subcategories) return;
-
             const targetIndex = subIndex + direction;
             if (targetIndex < 0 || targetIndex >= cat.subcategories.length) return;
-
             const temp = cat.subcategories[subIndex];
             cat.subcategories[subIndex] = cat.subcategories[targetIndex];
             cat.subcategories[targetIndex] = temp;
-
             saveCategories();
             renderCategories();
             renderAdminCategoryList();
-            showToast('ปรับย้ายลำดับหมวดหมู่ย่อยเรียบร้อยแล้ว');
+            renderAdminPackagesList();
         }
 
         function updateCategoryName(id, newName) {
@@ -1378,6 +1586,7 @@
             categories = categories.map(cat => cat.id === id ? { ...cat, name: trimmedName } : cat);
             saveCategories();
             renderCategories();
+            renderAdminPackagesList();
         }
 
         function updateCategoryDescription(id, newDesc) {
@@ -1398,6 +1607,7 @@
             });
             saveCategories();
             renderCategories();
+            renderAdminPackagesList();
         }
 
         function updateSubcategoryDescription(catId, subId, newDesc) {
@@ -1440,7 +1650,11 @@
             updateUrlCategory(id, null);
             renderCategories();
             loadActiveImages();
-            collapseAboutAndScroll();
+
+            setTimeout(() => {
+                const headerEl = document.getElementById('activeCategoryHeader');
+                if (headerEl) headerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
 
         function selectSubcategory(subId) {
@@ -1448,7 +1662,11 @@
             updateUrlCategory(activeCategoryId, subId);
             renderCategories();
             loadActiveImages();
-            collapseAboutAndScroll();
+
+            setTimeout(() => {
+                const headerEl = document.getElementById('activeCategoryHeader');
+                if (headerEl) headerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
 
         function resetToHome() {
@@ -1465,6 +1683,7 @@
                 saveCategories();
                 renderCategories();
                 renderAdminCategoryList();
+                renderAdminPackagesList();
             }
         }
 
@@ -1479,6 +1698,7 @@
                 saveCategories();
                 renderCategories();
                 renderAdminCategoryList();
+                renderAdminPackagesList();
             }
         }
 
@@ -1493,6 +1713,7 @@
                 saveCategories();
                 renderCategories();
                 renderAdminCategoryList();
+                renderAdminPackagesList();
                 loadActiveImages();
             }
         }
@@ -1512,6 +1733,7 @@
                 saveCategories();
                 renderCategories();
                 renderAdminCategoryList();
+                renderAdminPackagesList();
                 loadActiveImages();
             }
         }
@@ -1519,17 +1741,8 @@
         function renderImageGrid(images) {
             const imageGrid = document.getElementById('imageGrid');
             imageGrid.innerHTML = images.map((img, index) => `
-                <div 
-                    onclick="openLightbox(${index})"
-                    class="group relative aspect-[3/4] bg-neutral-900 rounded-xl overflow-hidden cursor-pointer border border-neutral-800/80 active:scale-95 transition-all duration-200 shadow-md"
-                >
-                    <img 
-                        src="${img.gridSrc}" 
-                        alt="${escapeHtml(img.name)}" 
-                        loading="lazy"
-                        decoding="async"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    >
+                <div onclick="openLightbox(${index})" class="group relative aspect-[3/4] bg-neutral-900 rounded-xl overflow-hidden cursor-pointer border border-neutral-800/80 active:scale-95 transition-all duration-200 shadow-md">
+                    <img src="${img.gridSrc}" alt="${escapeHtml(img.name)}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 sm:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2 sm:p-4">
                         ${img.subcategoryName ? `<span class="text-[8px] sm:text-[10px] text-neutral-400 uppercase tracking-wider font-semibold truncate">${escapeHtml(img.subcategoryName)}</span>` : ''}
                         <span class="text-[10px] sm:text-xs text-neutral-200 font-light truncate">${escapeHtml(img.name)}</span>
@@ -1556,7 +1769,6 @@
             }
 
             let folderIdsToLoad = [];
-
             if (activeSubcategoryId) {
                 const sub = currentCat.subcategories?.find(s => s.id === activeSubcategoryId);
                 if (sub && sub.folderId) folderIdsToLoad.push({ folderId: sub.folderId, name: sub.name });
@@ -1603,7 +1815,6 @@
                 const fetchPromises = uncashedFolders.map(async (item) => {
                     const q = `'${item.folderId}' in parents and mimeType contains 'image/' and trashed = false`;
                     const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,thumbnailLink)&key=${apiKey}`;
-
                     const response = await fetch(url);
                     const data = await response.json();
 
@@ -1623,14 +1834,11 @@
                 }
 
                 hideStatus();
-
                 loadedImages = allFiles.map(file => {
                     const gridSrc = file.thumbnailLink ? file.thumbnailLink.replace(/=s\d+/, '=s800') : `https://drive.google.com/thumbnail?id=${file.id}&sz=w800`;
                     const fullSrc = file.thumbnailLink ? file.thumbnailLink.replace(/=s\d+/, '=s2048') : `https://drive.google.com/thumbnail?id=${file.id}&sz=w2048`;
-
                     return { id: file.id, name: file.name, subcategoryName: file.subcategoryName, gridSrc, fullSrc };
                 });
-
                 renderImageGrid(loadedImages);
 
             } catch (err) {
@@ -1643,7 +1851,6 @@
             const statusMessage = document.getElementById('statusMessage');
             const statusText = document.getElementById('statusText');
             const statusSpinner = document.getElementById('statusSpinner');
-
             statusMessage.classList.remove('hidden');
             statusText.innerText = msg;
             if (showSpinner) statusSpinner.classList.remove('hidden');
@@ -1666,11 +1873,9 @@
         function updateLightboxContent() {
             const img = document.getElementById('lightboxImg');
             const counter = document.getElementById('lightboxCounter');
-            
             if (loadedImages[currentLightboxIndex]) {
                 img.src = loadedImages[currentLightboxIndex].fullSrc;
                 counter.innerText = `${currentLightboxIndex + 1} / ${loadedImages.length}`;
-
                 preloadLightboxImages(currentLightboxIndex);
             }
         }
@@ -1678,15 +1883,8 @@
         function preloadLightboxImages(index) {
             const nextIdx = (index + 1) % loadedImages.length;
             const prevIdx = (index - 1 + loadedImages.length) % loadedImages.length;
-            
-            if (loadedImages[nextIdx]) {
-                const nextImg = new Image();
-                nextImg.src = loadedImages[nextIdx].fullSrc;
-            }
-            if (loadedImages[prevIdx]) {
-                const prevImg = new Image();
-                prevImg.src = loadedImages[prevIdx].fullSrc;
-            }
+            if (loadedImages[nextIdx]) { const nextImg = new Image(); nextImg.src = loadedImages[nextIdx].fullSrc; }
+            if (loadedImages[prevIdx]) { const prevImg = new Image(); prevImg.src = loadedImages[prevIdx].fullSrc; }
         }
 
         function prevLightboxImage() {
