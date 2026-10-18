@@ -238,7 +238,7 @@
                 </div>
             </div>
 
-            <!-- Manage Package Types / Categories (วงแดงในรูป) -->
+            <!-- Manage Package Types / Categories -->
             <div class="pt-4 border-t border-neutral-800 space-y-3">
                 <div class="flex justify-between items-center">
                     <div>
@@ -816,7 +816,6 @@
         }
 
         function renderPackageCatalogCards() {
-            // Render Sub-Tabs Dynamically based on packageTypes
             const subTabsContainer = document.getElementById('packageSubTabs');
             if (subTabsContainer) {
                 let tabsHtml = `
@@ -932,7 +931,7 @@
             }, 100);
         }
 
-        // ADMIN PACKAGE TYPES MANAGEMENT (แก้ไขชื่อกลุ่มหมวดหมู่แพ็คเกจ)
+        // ADMIN PACKAGE TYPES MANAGEMENT
         function renderAdminPackageTypesList() {
             const container = document.getElementById('adminPkgTypesList');
             if (!container) return;
@@ -1330,21 +1329,25 @@
                 const data = await response.json();
 
                 if (data) {
+                    // 1. ดึงกลุ่มประเภทแพ็คเกจ
                     if (data.packageTypes && Array.isArray(data.packageTypes) && data.packageTypes.length > 0) {
                         packageTypes = data.packageTypes;
                         localStorage.setItem('photo_portfolio_pkg_types', JSON.stringify(packageTypes));
                     }
 
+                    // 2. ดึงหมวดหมู่ภาพผลงาน
                     if (data.categories && Array.isArray(data.categories) && data.categories.length > 0) {
                         categories = data.categories;
                         saveCategoriesLocallyOnly();
                     }
 
+                    // 3. ดึงรายการแพ็คเกจราคา
                     if (data.studioPackages && Array.isArray(data.studioPackages) && data.studioPackages.length > 0) {
                         studioPackages = data.studioPackages;
                         localStorage.setItem('photo_portfolio_packages', JSON.stringify(studioPackages));
                     }
                     
+                    // 4. ดึงข้อมูลเกี่ยวกับร้าน (AboutUs)
                     if (data.aboutInfo && Object.keys(data.aboutInfo).length > 0) {
                         aboutInfo = {
                             shopName: data.aboutInfo.shopName || aboutInfo.shopName,
@@ -1371,12 +1374,14 @@
                         renderAdminServicesList();
                     }
 
+                    // 5. ดึง API Key
                     if (data.apiKey) {
                         apiKey = data.apiKey;
                         if (document.getElementById('apiKeyInput')) document.getElementById('apiKeyInput').value = apiKey;
                         localStorage.setItem('photo_portfolio_api_key', apiKey);
                     }
 
+                    // อัปเดตการแสดงผลบนหน้าจอทั้งหมดใหม่
                     renderCategories();
                     renderAdminCategoryList();
                     renderAdminPackageTypesList();
