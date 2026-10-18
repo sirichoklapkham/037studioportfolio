@@ -238,6 +238,23 @@
                 </div>
             </div>
 
+            <!-- Manage Package Types / Categories (วงแดงในรูป) -->
+            <div class="pt-4 border-t border-neutral-800 space-y-3">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xs sm:text-sm font-semibold text-amber-400">🏷️ จัดการกลุ่มประเภทแพ็คเกจ (สำหรับ Dropdown & แถบเลือก)</h3>
+                        <p class="text-[10px] text-neutral-400">แก้ไขชื่อกลุ่มประเภทแพ็คเกจที่แสดงใน Dropdown เลือกลักษณะแพ็คเกจ</p>
+                    </div>
+                    <button onclick="addNewPackageType()" class="bg-amber-500 hover:bg-amber-400 text-black px-3 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 shadow">
+                        + เพิ่มประเภทใหม่
+                    </button>
+                </div>
+
+                <div id="adminPkgTypesList" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <!-- Package Types Manager Injected via JS -->
+                </div>
+            </div>
+
             <!-- Manage Packages & Pricing -->
             <div class="pt-4 border-t border-neutral-800 space-y-3">
                 <div class="flex justify-between items-center">
@@ -343,18 +360,7 @@
             <div id="packageCatalogContent" class="hidden mt-3 bg-neutral-900/90 border border-amber-500/30 rounded-3xl p-3.5 sm:p-5 shadow-2xl space-y-4 backdrop-blur-md">
                 <!-- Sub-Tabs for Package Categories -->
                 <div id="packageSubTabs" class="scroll-container flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
-                    <button onclick="switchPackageTab('all')" id="pkgTab-all" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 bg-amber-400 text-black">
-                        ทั้งหมด
-                    </button>
-                    <button onclick="switchPackageTab('selfie')" id="pkgTab-selfie" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 bg-neutral-900 text-neutral-400 border border-neutral-800">
-                        📸 เซลฟี่สตู
-                    </button>
-                    <button onclick="switchPackageTab('profile')" id="pkgTab-profile" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 bg-neutral-900 text-neutral-400 border border-neutral-800">
-                        👤 ถ่ายโปรไฟล์
-                    </button>
-                    <button onclick="switchPackageTab('rental')" id="pkgTab-rental" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 bg-neutral-900 text-neutral-400 border border-neutral-800">
-                        🏠 เช่าสตูดิโอ
-                    </button>
+                    <!-- Dynamic Sub-Tabs Injected via JS -->
                 </div>
 
                 <!-- Package Cards Grid -->
@@ -438,6 +444,13 @@
         const DEFAULT_LINE_LOGO_URL = 'https://drive.google.com/thumbnail?id=1-PCueW3wEo3k8n_OGYAVzuh2q05nqUb3&sz=w100';
         const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwAMS0xqSV-9t9com4LFQzcRZ7rHwNMp-GHkJyy-kU6YaYCEpTNR40io5fz__sGkZIm8g/exec';
         const DEFAULT_BOOKING_URL = 'https://zerva.app/037studio';
+
+        // Initial Default Package Categories / Types
+        const DEFAULT_PACKAGE_TYPES = [
+            { id: 'selfie', name: '📸 เซลฟี่สตู' },
+            { id: 'profile', name: '👤 ถ่ายโปรไฟล์' },
+            { id: 'rental', name: '🏠 เช่าสตูดิโอ' }
+        ];
 
         // Initial Default Studio Packages
         const DEFAULT_PACKAGES = [
@@ -571,6 +584,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         let urlSheetParam = urlParams.get('sheetUrl') || urlParams.get('scriptUrl');
 
+        let packageTypes = JSON.parse(localStorage.getItem('photo_portfolio_pkg_types')) || DEFAULT_PACKAGE_TYPES;
         let categories = JSON.parse(localStorage.getItem('photo_portfolio_categories_v2')) || DEFAULT_CATEGORIES;
         let studioPackages = JSON.parse(localStorage.getItem('photo_portfolio_packages')) || DEFAULT_PACKAGES;
         let aboutInfo = JSON.parse(localStorage.getItem('photo_portfolio_about')) || DEFAULT_ABOUT;
@@ -687,6 +701,7 @@
 
             renderAdminServicesList();
             renderAboutInfo();
+            renderAdminPackageTypesList();
             renderAdminPackagesList();
             renderPackageCatalogCards();
             renderCategories();
@@ -797,18 +812,36 @@
 
         function switchPackageTab(tabType) {
             activePackageTab = tabType;
-            ['all', 'selfie', 'profile', 'rental'].forEach(t => {
-                const el = document.getElementById(`pkgTab-${t}`);
-                if (el) {
-                    el.className = t === tabType 
-                        ? "px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 bg-amber-400 text-black"
-                        : "px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 bg-neutral-900 text-neutral-400 border border-neutral-800";
-                }
-            });
             renderPackageCatalogCards();
         }
 
         function renderPackageCatalogCards() {
+            // Render Sub-Tabs Dynamically based on packageTypes
+            const subTabsContainer = document.getElementById('packageSubTabs');
+            if (subTabsContainer) {
+                let tabsHtml = `
+                    <button onclick="switchPackageTab('all')" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 ${
+                        activePackageTab === 'all' 
+                            ? 'bg-amber-400 text-black' 
+                            : 'bg-neutral-900 text-neutral-400 border border-neutral-800'
+                    }">
+                        ทั้งหมด
+                    </button>
+                `;
+                packageTypes.forEach(t => {
+                    tabsHtml += `
+                        <button onclick="switchPackageTab('${t.id}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition active:scale-95 ${
+                            activePackageTab === t.id 
+                                ? 'bg-amber-400 text-black' 
+                                : 'bg-neutral-900 text-neutral-400 border border-neutral-800'
+                        }">
+                            ${escapeHtml(t.name)}
+                        </button>
+                    `;
+                });
+                subTabsContainer.innerHTML = tabsHtml;
+            }
+
             const grid = document.getElementById('packageCardsGrid');
             if (!grid) return;
 
@@ -899,6 +932,56 @@
             }, 100);
         }
 
+        // ADMIN PACKAGE TYPES MANAGEMENT (แก้ไขชื่อกลุ่มหมวดหมู่แพ็คเกจ)
+        function renderAdminPackageTypesList() {
+            const container = document.getElementById('adminPkgTypesList');
+            if (!container) return;
+
+            container.innerHTML = packageTypes.map((typeObj, index) => `
+                <div class="bg-neutral-950 p-2.5 rounded-xl border border-neutral-800 flex items-center gap-2">
+                    <input type="text" value="${escapeHtml(typeObj.name)}" onchange="updatePackageTypeName(${index}, this.value)" placeholder="ชื่อกลุ่มประเภท" class="flex-1 bg-neutral-900 border border-neutral-800 p-1.5 rounded text-xs text-amber-300 font-semibold focus:outline-none">
+                    <button onclick="deletePackageType(${index})" class="text-[10px] text-red-400 border border-red-900/30 bg-red-950/20 px-2 py-1 rounded shrink-0">ลบ</button>
+                </div>
+            `).join('');
+        }
+
+        function addNewPackageType() {
+            const name = prompt('กรอกชื่อกลุ่มประเภทแพ็คเกจใหม่ (เช่น 🎬 ถ่ายมิวสิควิดีโอ):');
+            if (name && name.trim()) {
+                const newId = 'pkgtype-' + Date.now().toString().slice(-4);
+                packageTypes.push({ id: newId, name: name.trim() });
+                savePackageTypes();
+                renderAdminPackageTypesList();
+                renderAdminPackagesList();
+                renderPackageCatalogCards();
+                showToast('เพิ่มกลุ่มประเภทใหม่เรียบร้อยแล้ว');
+            }
+        }
+
+        function updatePackageTypeName(index, newName) {
+            if (!newName.trim()) return;
+            packageTypes[index].name = newName.trim();
+            savePackageTypes();
+            renderAdminPackagesList();
+            renderPackageCatalogCards();
+        }
+
+        function deletePackageType(index) {
+            if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบกลุ่มประเภทนี้?')) {
+                packageTypes.splice(index, 1);
+                savePackageTypes();
+                renderAdminPackageTypesList();
+                renderAdminPackagesList();
+                renderPackageCatalogCards();
+                showToast('ลบกลุ่มประเภทเรียบร้อยแล้ว');
+            }
+        }
+
+        function savePackageTypes() {
+            localStorage.setItem('photo_portfolio_pkg_types', JSON.stringify(packageTypes));
+            if (sheetUrl) backupToSheet();
+        }
+
         // ADMIN PACKAGE MANAGEMENT FUNCTIONS
         function renderAdminPackagesList() {
             const container = document.getElementById('adminPackagesList');
@@ -920,11 +1003,10 @@
                     <div class="bg-neutral-950 p-3.5 rounded-2xl border border-neutral-800/80 space-y-2.5">
                         <div class="flex justify-between items-center border-b border-neutral-900 pb-2">
                             <span class="text-xs font-bold text-amber-400">แพ็คเกจที่ ${idx + 1}</span>
-                            <div class="flex gap-2">
-                                <select id="pkg_type_${idx}" onchange="updateAdminPackage(${idx})" class="bg-neutral-900 border border-neutral-800 text-neutral-300 text-[11px] rounded-lg px-2 py-1">
-                                    <option value="selfie" ${pkg.type === 'selfie' ? 'selected' : ''}>📸 เซลฟี่สตู</option>
-                                    <option value="profile" ${pkg.type === 'profile' ? 'selected' : ''}>👤 ถ่ายโปรไฟล์</option>
-                                    <option value="rental" ${pkg.type === 'rental' ? 'selected' : ''}>🏠 เช่าสตูดิโอ</option>
+                            <div class="flex gap-2 items-center">
+                                <label class="text-[10px] text-neutral-400 shrink-0">กลุ่มประเภท:</label>
+                                <select id="pkg_type_${idx}" onchange="updateAdminPackage(${idx})" class="bg-neutral-900 border border-neutral-800 text-amber-300 text-[11px] font-semibold rounded-lg px-2 py-1 focus:outline-none">
+                                    ${packageTypes.map(t => `<option value="${t.id}" ${pkg.type === t.id ? 'selected' : ''}>${escapeHtml(t.name)}</option>`).join('')}
                                 </select>
                                 <button onclick="deleteAdminPackage(${idx})" class="text-[10px] text-red-400 border border-red-900/30 bg-red-950/20 px-2.5 py-1 rounded-lg">ลบแพ็คเกจ</button>
                             </div>
@@ -978,9 +1060,10 @@
         }
 
         function addNewAdminPackage() {
+            const defaultType = packageTypes[0]?.id || 'selfie';
             const newPkg = {
                 id: 'pkg-' + Date.now().toString().slice(-6),
-                type: 'selfie',
+                type: defaultType,
                 categoryId: categories[0]?.id || '',
                 subcategoryId: '',
                 title: 'แพ็คเกจใหม่',
@@ -1185,6 +1268,7 @@
 
             localStorage.setItem('photo_portfolio_about', JSON.stringify(aboutInfo));
             saveStudioPackages();
+            savePackageTypes();
             renderAboutInfo();
             renderAdminServicesList();
             renderAdminPackagesList();
@@ -1218,6 +1302,7 @@
                 apiKey: apiKey,
                 categories: categories,
                 aboutInfo: aboutInfo,
+                packageTypes: packageTypes,
                 studioPackages: studioPackages
             };
 
@@ -1245,6 +1330,11 @@
                 const data = await response.json();
 
                 if (data) {
+                    if (data.packageTypes && Array.isArray(data.packageTypes) && data.packageTypes.length > 0) {
+                        packageTypes = data.packageTypes;
+                        localStorage.setItem('photo_portfolio_pkg_types', JSON.stringify(packageTypes));
+                    }
+
                     if (data.categories && Array.isArray(data.categories) && data.categories.length > 0) {
                         categories = data.categories;
                         saveCategoriesLocallyOnly();
@@ -1289,6 +1379,7 @@
 
                     renderCategories();
                     renderAdminCategoryList();
+                    renderAdminPackageTypesList();
                     renderAdminPackagesList();
                     renderPackageCatalogCards();
                     loadActiveImages();
@@ -1416,6 +1507,7 @@
                 if (passwordInput === ADMIN_PASSWORD) {
                     panel.classList.remove('hidden');
                     showToast('เข้าสู่ระบบหลังบ้านสำเร็จ');
+                    renderAdminPackageTypesList();
                     renderAdminPackagesList();
                     panel.scrollIntoView({ behavior: 'smooth' });
                 } else {
