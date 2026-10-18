@@ -590,7 +590,8 @@
         let aboutInfo = JSON.parse(localStorage.getItem('photo_portfolio_about')) || DEFAULT_ABOUT;
         let apiKey = localStorage.getItem('photo_portfolio_api_key') || '';
         
-        let sheetUrl = urlSheetParam || localStorage.getItem('photo_portfolio_sheet_url') || DEFAULT_SCRIPT_URL;
+        // บังคับใช้ DEFAULT_SCRIPT_URL เป็นค่าเริ่มต้นหากไม่ได้ส่งผ่าน URL Parameter
+        let sheetUrl = urlSheetParam || DEFAULT_SCRIPT_URL;
         localStorage.setItem('photo_portfolio_sheet_url', sheetUrl);
 
         let { activeCategoryId, activeSubcategoryId } = getInitialCategoryState();
@@ -706,7 +707,6 @@
             renderPackageCatalogCards();
             renderCategories();
             renderAdminCategoryList();
-            loadActiveImages();
 
             setupDesktopHorizontalScroll('categoryContainer');
             setupDesktopHorizontalScroll('subcategoryContainer');
@@ -715,8 +715,11 @@
             setupMobileScrollHintListener('categoryContainer', 'categoryFadeHint');
             setupMobileScrollHintListener('subcategoryContainer', 'subcategoryFadeHint');
 
+            // ดึงข้อมูลจาก Google Sheets เสมอเพื่อให้อัปเดตข้อมูลล่าสุดบนทุกเครื่อง
             if (sheetUrl) {
                 restoreFromSheet(true);
+            } else {
+                loadActiveImages();
             }
 
             const initialSliderVal = window.innerWidth < 640 ? 2 : 4;
@@ -1390,10 +1393,13 @@
                     loadActiveImages();
                     
                     if (!silent) showToast('ดึงข้อมูลกู้คืนจาก Google ชีทสำเร็จ');
+                } else {
+                    loadActiveImages();
                 }
             } catch (err) {
                 console.error(err);
                 if (!silent) showToast('เกิดข้อผิดพลาดในการดึงข้อมูลจาก Google ชีท', true);
+                loadActiveImages();
             }
         }
 
