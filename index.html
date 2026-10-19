@@ -590,7 +590,6 @@
         let aboutInfo = JSON.parse(localStorage.getItem('photo_portfolio_about')) || DEFAULT_ABOUT;
         let apiKey = localStorage.getItem('photo_portfolio_api_key') || '';
         
-        // บังคับใช้ DEFAULT_SCRIPT_URL เป็นค่าเริ่มต้นหากไม่ได้ส่งผ่าน URL Parameter
         let sheetUrl = urlSheetParam || DEFAULT_SCRIPT_URL;
         localStorage.setItem('photo_portfolio_sheet_url', sheetUrl);
 
@@ -715,11 +714,12 @@
             setupMobileScrollHintListener('categoryContainer', 'categoryFadeHint');
             setupMobileScrollHintListener('subcategoryContainer', 'subcategoryFadeHint');
 
-            // ดึงข้อมูลจาก Google Sheets เสมอเพื่อให้อัปเดตข้อมูลล่าสุดบนทุกเครื่อง
+            // ดึงข้อมูลจาก Google Sheets
             if (sheetUrl) {
                 restoreFromSheet(true);
             } else {
                 loadActiveImages();
+                checkAndScrollToHeader();
             }
 
             const initialSliderVal = window.innerWidth < 640 ? 2 : 4;
@@ -747,6 +747,16 @@
                 loadActiveImages();
             });
         });
+
+        function checkAndScrollToHeader() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('cat') || params.get('category')) {
+                setTimeout(() => {
+                    const headerEl = document.getElementById('activeCategoryHeader');
+                    if (headerEl) headerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
+        }
 
         function setupMobileScrollHintListener(containerId, hintId) {
             const container = document.getElementById(containerId);
@@ -1384,6 +1394,11 @@
                         localStorage.setItem('photo_portfolio_api_key', apiKey);
                     }
 
+                    // อัปเดตการระบุหมวดหมู่จาก URL Parameter อีกครั้ง ให้เปิดตรงตามลิงก์ที่แชร์มา 100%
+                    const state = getInitialCategoryState();
+                    activeCategoryId = state.activeCategoryId;
+                    activeSubcategoryId = state.activeSubcategoryId;
+
                     // อัปเดตการแสดงผลบนหน้าจอทั้งหมดใหม่
                     renderCategories();
                     renderAdminCategoryList();
@@ -1392,14 +1407,18 @@
                     renderPackageCatalogCards();
                     loadActiveImages();
                     
+                    checkAndScrollToHeader();
+
                     if (!silent) showToast('ดึงข้อมูลกู้คืนจาก Google ชีทสำเร็จ');
                 } else {
                     loadActiveImages();
+                    checkAndScrollToHeader();
                 }
             } catch (err) {
                 console.error(err);
                 if (!silent) showToast('เกิดข้อผิดพลาดในการดึงข้อมูลจาก Google ชีท', true);
                 loadActiveImages();
+                checkAndScrollToHeader();
             }
         }
 
@@ -1427,9 +1446,13 @@
         }
 
         function updateUrlCategory(catId, subId = null) {
-            const url = new URL(window.location.origin + window.location.pathname);
+            const url = new URL(window.location.href);
             url.searchParams.set('cat', catId);
-            if (subId) url.searchParams.set('sub', subId);
+            if (subId) {
+                url.searchParams.set('sub', subId);
+            } else {
+                url.searchParams.delete('sub');
+            }
             window.history.pushState({ catId, subId }, '', url.toString());
         }
 
@@ -1440,9 +1463,14 @@
         function copyCategoryLinkById(catId, subId = null) {
             const cat = categories.find(c => c.id === catId);
             const sub = cat?.subcategories?.find(s => s.id === subId);
-            const url = new URL(window.location.origin + window.location.pathname);
+            
+            const url = new URL(window.location.href);
             url.searchParams.set('cat', catId);
-            if (subId) url.searchParams.set('sub', subId);
+            if (subId) {
+                url.searchParams.set('sub', subId);
+            } else {
+                url.searchParams.delete('sub');
+            }
 
             const title = sub ? `${cat?.name} > ${sub.name}` : cat?.name;
             copyToClipboard(url.toString(), `คัดลอกลิงก์หมวดหมู่ "${title || ''}" เรียบร้อยแล้ว`);
